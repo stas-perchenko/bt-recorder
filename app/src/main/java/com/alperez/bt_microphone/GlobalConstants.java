@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class GlobalConstants {
     public static final String DB_NAME = "bt_recorder";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 3;
 
 
     public static final UUID UUID_SERVICE_1 = UUID.fromString("6705ef4c-eb38-49a2-9a7b-679e52aeb3d6");

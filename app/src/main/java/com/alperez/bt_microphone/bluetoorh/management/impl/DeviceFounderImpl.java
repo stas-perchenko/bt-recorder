@@ -181,7 +181,7 @@ public class DeviceFounderImpl implements DeviceFounder {
      * @param device
      */
     private void doJobOnDiscoveredDevice(DiscoveredBluetoothDevice device) throws Exception {
-        long deviceId = BlacklistedBtDevice.create(device.getDevice().getAddress(), new Date(), null).id();
+        long deviceId = BlacklistedBtDevice.create(device.getDevice().getAddress(), null, new Date(), null).id();
 
         BlacklistedBtDevice blackDev = dbAdapter.selectBlacklistedDeviceById(deviceId);
         if (blackDev != null) {
@@ -239,6 +239,14 @@ public class DeviceFounderImpl implements DeviceFounder {
                     }
                 }
             } while(!timeoutCondition && !Thread.interrupted());
+
+
+            //--- Save device to blacklist ---
+            if (uuidCondensor.getNumUUIDs() > 0) {
+                long res = dbAdapter.insertDeviceToBlacklist(BlacklistedBtDevice.create(device.getDevice().getAddress(), device.getDevice().getName(), new Date(), null));
+                Log.d(TAG, String.format("~~~~> Device was inserted to the blacklist: %s, ins res = %d ", device.getDevice().getAddress(), res));
+            }
+
 
         } finally {
             //--- Start discovery process back ---

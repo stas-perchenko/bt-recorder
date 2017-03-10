@@ -39,19 +39,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
 
-        db.execSQL(String.format("CREATE TABLE %9$s (%1$s INTEGER PRIMARY KEY, %2$s TEXT, %3$s TEXT, %4$s INTEGER, %5$s INTEGER, %6$s INTEGER, %7$s TEXT, %8$s INTEGER);",
+        db.execSQL(String.format("CREATE TABLE %11$s (%1$s INTEGER PRIMARY KEY, %2$s TEXT, %3$s TEXT, %4$s TEXT, %5$s INTEGER, %6$s INTEGER, %7$s INTEGER, %8$s TEXT, %9$s INTEGER, %10$s INTEGER);",
                 ValidBtDevice.COLUMN_ID,
                 ValidBtDevice.COLUMN_MAC,
+                ValidBtDevice.COLUMN_ORIG_DEVICE_NAME,
                 ValidBtDevice.COLUMN_SERIAL_NUM,
                 ValidBtDevice.COLUMN_HARD_VERSION,
                 ValidBtDevice.COLUMN_SOFT_VERSION,
                 ValidBtDevice.COLUMN_RELEASE_DATE,
-                ValidBtDevice.COLUMN_LOCAL_NAME,
-                ValidBtDevice.COLUMN_TIME_DISCOVERED, ValidBtDevice.TABLE_NAME));
+                ValidBtDevice.COLUMN_USER_DEVINED_NAME,
+                ValidBtDevice.COLUMN_TIME_DISCOVERED,
+                ValidBtDevice.COLUMN_TIME_LAST_CONNECTED, ValidBtDevice.TABLE_NAME));
 
-        db.execSQL(String.format("CREATE TABLE %4$s (%1$s INTEGER PRIMARY KEY, %2$s TEXT, %3$s INTEGER);",
+        db.execSQL(String.format("CREATE TABLE %5$s (%1$s INTEGER PRIMARY KEY, %2$s TEXT, %3$s TEXT, %4$s INTEGER);",
                 BlacklistedBtDevice.COLUMN_ID,
                 BlacklistedBtDevice.COLUMN_MAC,
+                BlacklistedBtDevice.COLUMN_DEVICE_NAME,
                 BlacklistedBtDevice.COLUMN_TIME_DISCOVERED, BlacklistedBtDevice.TABLE_NAME));
 
     }

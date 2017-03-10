@@ -17,15 +17,20 @@ public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, C
 
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_MAC = "mac";
+    public static final String COLUMN_ORIG_DEVICE_NAME = "dev_name";
     public static final String COLUMN_SERIAL_NUM = "serial";
     public static final String COLUMN_HARD_VERSION = "h_version";
     public static final String COLUMN_SOFT_VERSION = "s_version";
     public static final String COLUMN_RELEASE_DATE = "release_date";
-    public static final String COLUMN_LOCAL_NAME = "local_name";
+    public static final String COLUMN_USER_DEVINED_NAME = "local_name";
     public static final String COLUMN_TIME_DISCOVERED = "discovered_at";
+    public static final String COLUMN_TIME_LAST_CONNECTED = "last_time_connected";
+
 
     //--- Storeable fields ---
     public abstract String macAddress();
+    @Nullable
+    public abstract String deviceName();
     public abstract String serialNumber();
     public abstract int hardwareVersion();
     public abstract int firmwareVersion();
@@ -33,6 +38,7 @@ public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, C
     @Nullable
     public abstract String userDefinedName();
     public abstract Date timeDiscovered();
+    public abstract Date timeLastConnected();
 
     //--- Non-storeable runtime-calculated fields ---
     @Nullable
@@ -55,28 +61,36 @@ public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, C
         return toBuilder().setBluetoothDevice(device).build();
     }
 
+    public ValidBtDevice withTimeLastConnected(Date timeLastConnected) {
+        return toBuilder().setTimeLastConnected(new Date(timeLastConnected.getTime())).build();
+    }
+
     public ValidBtDevice clone() {
         return builder()
                 .setMacAddress(macAddress())
+                .setDeviceName(deviceName())
                 .setSerialNumber(serialNumber())
                 .setHardwareVersion(hardwareVersion())
                 .setFirmwareVersion(firmwareVersion())
                 .setReleaseDate(releaseDate())
                 .setUserDefinedName(userDefinedName())
-                .setTimeDiscovered(timeDiscovered())
+                .setTimeDiscovered(new Date(timeDiscovered().getTime()))
                 .setBluetoothDevice(bluetoothDevice())
+                .setTimeLastConnected(timeLastConnected())
                 .build();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder setMacAddress(String macAddress);
+        public abstract Builder setDeviceName(String deviceName);
         public abstract Builder setSerialNumber(String serialNumber);
         public abstract Builder setHardwareVersion(int hardwareVersion);
         public abstract Builder setFirmwareVersion(int firmwareVersion);
         public abstract Builder setReleaseDate(Date releaseDate);
         public abstract Builder setUserDefinedName(@Nullable String userDefinedName);
         public abstract Builder setTimeDiscovered(Date timeDiscovered);
+        public abstract Builder setTimeLastConnected(Date timeLastConnected);
 
         public abstract Builder setBluetoothDevice(BluetoothDevice bluetoothDevice);
 
