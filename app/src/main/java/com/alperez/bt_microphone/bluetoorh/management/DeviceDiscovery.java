@@ -1,7 +1,5 @@
 package com.alperez.bt_microphone.bluetoorh.management;
 
-import android.bluetooth.BluetoothDevice;
-
 /**
  * The interface of entities which can discover devices.
  * It has actions to start/pause/resume discoveryprocess
@@ -15,5 +13,5 @@ public interface DeviceDiscovery {
     void resumeDiscovery();
     void stopDiscovery();
 
-    void onDeviceDiscivered(BluetoothDevice device);
+    void setOnDeviceDiscoveryListener(OnDeviceDiscoveryListener l);
 }
