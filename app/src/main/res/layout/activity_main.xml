@@ -10,8 +10,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.alperez.bt_microphone.ui.activity.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+
+
+    <Button android:id="@+id/btn_start_stop"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="start"/>
+
 </RelativeLayout>

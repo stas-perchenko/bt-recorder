@@ -13,6 +13,7 @@ public interface DeviceDiscovery {
     void resumeDiscovery();
     void stopDiscovery();
     boolean isDiscovering();
+    void release();
 
     void setOnDeviceDiscoveryListener(OnDeviceDiscoveryListener l);
 }

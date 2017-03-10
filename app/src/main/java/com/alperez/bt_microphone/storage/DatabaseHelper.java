@@ -49,7 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ValidBtDevice.COLUMN_LOCAL_NAME,
                 ValidBtDevice.COLUMN_TIME_DISCOVERED, ValidBtDevice.TABLE_NAME));
 
-        db.execSQL(String.format("CREATE TABLE %4$s (%1$s INTEGER PRIMARY KEY, %2$s TEXT, %3$s INTEGER,);",
+        db.execSQL(String.format("CREATE TABLE %4$s (%1$s INTEGER PRIMARY KEY, %2$s TEXT, %3$s INTEGER);",
                 BlacklistedBtDevice.COLUMN_ID,
                 BlacklistedBtDevice.COLUMN_MAC,
                 BlacklistedBtDevice.COLUMN_TIME_DISCOVERED, BlacklistedBtDevice.TABLE_NAME));

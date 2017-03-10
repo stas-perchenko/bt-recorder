@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @AutoValue
 public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, Cloneable {
-    public static final String TABLE_NAME = "valid-devices";
+    public static final String TABLE_NAME = "valid_devices";
 
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_MAC = "mac";

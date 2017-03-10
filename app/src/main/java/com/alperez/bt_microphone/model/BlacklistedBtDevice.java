@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @AutoValue
 public abstract class BlacklistedBtDevice extends BaseDbModel implements Parcelable, Cloneable {
-    public static final String TABLE_NAME = "blacklisted-devices";
+    public static final String TABLE_NAME = "blacklisted_devices";
 
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_MAC = "mac";
