@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.alperez.bt_microphone.model.BlacklistedBtDevice;
+import com.alperez.bt_microphone.model.ValidBtDevice;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -67,6 +70,15 @@ public class DatabaseAdapter {
     /******************************  Selection methods  *******************************************/
     /**********************************************************************************************/
 
+    public BlacklistedBtDevice selectBlacklistedDeviceById(long id) {
+        //TODO Implement this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        return null;
+    }
+
+    public ValidBtDevice selectValidDeviceById(long id) {
+        //TODO Implement this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        return null;
+    }
 
 
 

@@ -1,5 +1,7 @@
 package com.alperez.bt_microphone.bluetoorh.management;
 
+import android.bluetooth.BluetoothDevice;
+
 import com.alperez.bt_microphone.model.BlacklistedBtDevice;
 import com.alperez.bt_microphone.model.ValidBtDevice;
 
@@ -8,6 +10,7 @@ import com.alperez.bt_microphone.model.ValidBtDevice;
  */
 
 public interface OnDeviceFoundListener {
-    void onValidDeviceFouns(ValidBtDevice device);
+    void onNewRawDeviceFound(BluetoothDevice device);
+    void onValidDeviceFound(ValidBtDevice device);
     void onBlacklistedDeviceFound(BlacklistedBtDevice device);
 }
