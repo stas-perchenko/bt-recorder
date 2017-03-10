@@ -1,5 +1,6 @@
 package com.alperez.bt_microphone.model;
 
+import android.bluetooth.BluetoothDevice;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
@@ -23,6 +24,7 @@ public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, C
     public static final String COLUMN_LOCAL_NAME = "local_name";
     public static final String COLUMN_TIME_DISCOVERED = "discovered_at";
 
+    //--- Storeable fields ---
     public abstract String macAddress();
     public abstract String serialNumber();
     public abstract int hardwareVersion();
@@ -32,6 +34,10 @@ public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, C
     public abstract String userDefinedName();
     public abstract Date timeDiscovered();
 
+    //--- Non-storeable runtime-calculated fields ---
+    @Nullable
+    public abstract BluetoothDevice bluetoothDevice();
+
 
     @Override
     public long id() {
@@ -39,10 +45,15 @@ public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, C
     }
 
 
-    public abstract Builder toBuilder();
-
     public static Builder builder() {
         return new AutoValue_ValidBtDevice.Builder();
+    }
+
+
+    public abstract Builder toBuilder();
+
+    public ValidBtDevice withBluetoothDevice(@Nullable BluetoothDevice device) {
+        return toBuilder().setBluetoothDevice(device).build();
     }
 
     public ValidBtDevice clone() {
@@ -54,6 +65,7 @@ public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, C
                 .setReleaseDate(releaseDate())
                 .setUserDefinedName(userDefinedName())
                 .setTimeDiscovered(timeDiscovered())
+                .setBluetoothDevice(bluetoothDevice())
                 .build();
     }
 
@@ -66,6 +78,8 @@ public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, C
         public abstract Builder setReleaseDate(Date releaseDate);
         public abstract Builder setUserDefinedName(@Nullable String userDefinedName);
         public abstract Builder setTimeDiscovered(Date timeDiscovered);
+
+        public abstract Builder setBluetoothDevice(BluetoothDevice bluetoothDevice);
 
         public abstract ValidBtDevice build();
     }
