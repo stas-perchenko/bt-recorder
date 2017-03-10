@@ -33,8 +33,8 @@ public abstract class BlacklistedBtDevice extends BaseDbModel implements Parcela
     public abstract BluetoothDevice bluetoothDevice();
 
     @Override
-    public long id() {
-        return macAddress().hashCode();
+    protected String getStringForId() {
+        return macAddress();
     }
 
 

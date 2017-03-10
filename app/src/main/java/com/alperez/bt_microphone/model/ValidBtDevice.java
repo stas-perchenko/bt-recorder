@@ -40,10 +40,9 @@ public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, C
 
 
     @Override
-    public long id() {
-        return macAddress().hashCode();
+    protected String getStringForId() {
+        return macAddress();
     }
-
 
     public static Builder builder() {
         return new AutoValue_ValidBtDevice.Builder();
