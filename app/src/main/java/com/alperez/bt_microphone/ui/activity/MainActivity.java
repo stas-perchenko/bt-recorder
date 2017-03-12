@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private DeviceFounder deviceFounder;
+
 
 
 
@@ -30,53 +30,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        DeviceDiscovery deviceDiscovery = null;
-        try {
-            deviceDiscovery = new DeviceDiscoveryImpl(this, BtUtils.getBtAdapter(this));
-        } catch (BluetoothNotSupportedException e) {
-            e.printStackTrace();
-            finish();
-            return;
-        }
 
-
-        deviceFounder = new DeviceFounderImpl(this, deviceDiscovery);
-        deviceFounder.setOnDeviceFoundListener(new OnDeviceFoundListener() {
-            @Override
-            public void onNewRawDeviceFound(DiscoveredBluetoothDevice device) {
-
-            }
-
-            @Override
-            public void onValidDeviceFound(ValidBtDevice device) {
-
-            }
-
-            @Override
-            public void onBlacklistedDeviceFound(BlacklistedBtDevice device) {
-
-            }
-        });
-
-
-        findViewById(R.id.btn_start_stop).setOnClickListener(v -> onStartStop((Button)v));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (deviceFounder.isStarted()) {
-            deviceFounder.release();
-        }
+
     }
 
-    private void onStartStop(Button btn) {
-        if (deviceFounder.isStarted()) {
-            deviceFounder.stop();
-            btn.setText("start");
-        } else {
-            deviceFounder.start();
-            btn.setText("stop");
-        }
-    }
+
 }

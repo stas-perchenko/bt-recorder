@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingBottom="@dimen/activity_vertical_margin">
+
+            <!-- New available devices section /-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:gravity="center_horizontal"
+                android:textColor="@color/text_white"
+                android:textStyle="bold"
+                android:background="@color/bg_section_title"
+                android:text="@string/title_new_discovered_devices"/>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView android:id="@+id/noItemsNewDevices"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/no_devices_placeholder_height"
+                    android:textColor="@color/text_light"
+                    android:gravity="center"
+                    android:text="@string/no_devices"/>
+
+                <LinearLayout
+                    android:id="@+id/containerNewDevices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+            </FrameLayout>
+
+
+            <!-- Known devices section /-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:gravity="center_horizontal"
+                android:textColor="@color/text_white"
+                android:textStyle="bold"
+                android:background="@color/bg_section_title"
+                android:text="@string/title_saved_devices"/>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView android:id="@+id/noItemsKnownDevices"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/no_devices_placeholder_height"
+                    android:textColor="@color/text_light"
+                    android:gravity="center"
+                    android:text="@string/no_devices"/>
+
+                <LinearLayout
+                    android:id="@+id/containerKnownDevices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+            </FrameLayout>
+
+
+            <!-- Other, invalid devices section /-->
+            <LinearLayout android:id="@+id/sectionOtherDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:gravity="center_horizontal"
+                    android:textColor="@color/text_white"
+                    android:textStyle="bold"
+                    android:background="@color/bg_section_title"
+                    android:text="@string/title_other_devices"/>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView android:id="@+id/noItemsOtherDevices"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/no_devices_placeholder_height"
+                        android:textColor="@color/text_light"
+                        android:gravity="center"
+                        android:text="@string/no_devices"/>
+
+                    <LinearLayout
+                        android:id="@+id/containerOtherDevices"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</layout>

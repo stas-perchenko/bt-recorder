@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" alias="v"/>
+        <import type="android.text.TextUtils" alias="TU"/>
+        <import type="com.alperez.bt_microphone.ui.viewmodel.BtDeviceViewModel" alias="VM" />
+        <import type="com.alperez.bt_microphone.utils.FormatUtils"/>
+        <import type="java.lang.String"/>
+
+        <variable
+            name="viewModel"
+            type="com.alperez.bt_microphone.ui.viewmodel.BtDeviceViewModel"/>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_gravity="center_vertical"
+            app:deviceTypeIcon="@{viewModel.getDeviceType()}"
+            android:src="@drawable/ic_bluetooth_disabled_black_24dp"/>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+
+            <TextView android:id="@+id/rssi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_light"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignBaseline="@id/title"
+                app:rssi="@{viewModel.RSSI}"/>
+
+            <TextView android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lines="1"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@color/text_regular"
+                android:layout_marginRight="8dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/rssi"
+                android:layout_alignWithParentIfMissing="true"
+                android:text="@{TU.isEmpty(viewModel.name) ? viewModel.macAddress : viewModel.name}"/>
+
+
+            <TextView android:id="@+id/subproperty1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/title"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:textColor="@color/text_light"
+                android:text="@{viewModel.macAddress}"
+                android:visibility="@{TU.isEmpty(viewModel.name) ? v.GONE : v.VISIBLE}"  />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/subproperty1"
+                android:layout_below="@id/title"
+                android:textColor="@color/text_light"
+                android:text="@{(viewModel.timeFirstDiscovered != null) ? String.format(FormatUtils.UI_DATE_FORMAT_RU, viewModel.timeFirstDiscovered) : FormatUtils.EMPTY_STRING}"
+                android:visibility="@{(viewModel.timeFirstDiscovered == null) ? v.GONE : v.VISIBLE}"
+                />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:src="@drawable/ic_keyboard_arrow_right_black_18dp"
+            android:visibility="@{(viewModel.getDeviceType()==VM.DEVICE_TYPE_INVALID) ? v.GONE : v.VISIBLE}"/>
+
+    </LinearLayout>
+
+</layout>
