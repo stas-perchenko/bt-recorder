@@ -4,4 +4,13 @@
     <string name="title_saved_devices">Already known pancake devices</string>
     <string name="title_other_devices">Other Bluetooth devices</string>
     <string name="no_devices">No devices found</string>
+
+    <string name="text_no_saved_devices">There are no presaved pancake devices on this phone.</string>
+    <string name="prompt_last_connected_device">You can connect to the last used device:</string>
+    <string name="prompt_check_known_devices">Or you can check which ones from already known devices are in range.</string>
+    <string name="prompt_search_new_devices">You can search for new pancake devices in range.</string>
+
+    <string name="action_connect_last_device">Connect</string>
+    <string name="action_check_known_devices">Check known devices</string>
+    <string name="action_search_new_devices">Search new devices</string>
 </resources>

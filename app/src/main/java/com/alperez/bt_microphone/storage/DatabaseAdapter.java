@@ -7,7 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import com.alperez.bt_microphone.model.BlacklistedBtDevice;
 import com.alperez.bt_microphone.model.ValidBtDevice;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by stanislav.perchenko on 3/9/2017.
@@ -80,20 +82,10 @@ public class DatabaseAdapter {
 
     public ValidBtDevice selectValidDeviceById(long id) {
         String where = String.format("%s = %d", BlacklistedBtDevice.COLUMN_ID, id);
-        Cursor c = db.query(BlacklistedBtDevice.TABLE_NAME, null, where, null, null, null, null);
+        Cursor c = db.query(ValidBtDevice.TABLE_NAME, null, where, null, null, null, null);
         try {
             if (c.moveToFirst()) {
-                return ValidBtDevice.builder()
-                        .setMacAddress(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_MAC)))
-                        .setDeviceName(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_ORIG_DEVICE_NAME)))
-                        .setSerialNumber(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_SERIAL_NUM)))
-                        .setHardwareVersion(c.getInt(c.getColumnIndex(ValidBtDevice.COLUMN_HARD_VERSION)))
-                        .setFirmwareVersion(c.getInt(c.getColumnIndex(ValidBtDevice.COLUMN_SOFT_VERSION)))
-                        .setReleaseDate(new Date(c.getLong(c.getColumnIndex(ValidBtDevice.COLUMN_RELEASE_DATE))))
-                        .setUserDefinedName(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_USER_DEVINED_NAME)))
-                        .setTimeDiscovered(new Date(c.getLong(c.getColumnIndex(ValidBtDevice.COLUMN_TIME_DISCOVERED))))
-                        .setTimeLastConnected(new Date(c.getLong(c.getColumnIndex(ValidBtDevice.COLUMN_TIME_LAST_CONNECTED))))
-                        .build();
+                return buildValidDeviceFromCursor(c);
             } else {
                 return null;
             }
@@ -102,7 +94,34 @@ public class DatabaseAdapter {
         }
     }
 
+    public List<ValidBtDevice> selectAllValidDevices() {
+        Cursor c = db.query(ValidBtDevice.TABLE_NAME, null, null, null, null, null, ValidBtDevice.COLUMN_TIME_LAST_CONNECTED);
+        try {
+            List<ValidBtDevice> result = new ArrayList<>(5);
+            if (c.moveToFirst()) {
+                do {
+                    result.add(buildValidDeviceFromCursor(c));
+                } while (c.moveToNext());
+            }
+            return result;
+        } finally {
+            c.close();
+        }
+    }
 
+    private ValidBtDevice buildValidDeviceFromCursor(Cursor c) {
+        return ValidBtDevice.builder()
+                .setMacAddress(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_MAC)))
+                .setDeviceName(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_ORIG_DEVICE_NAME)))
+                .setSerialNumber(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_SERIAL_NUM)))
+                .setHardwareVersion(c.getInt(c.getColumnIndex(ValidBtDevice.COLUMN_HARD_VERSION)))
+                .setFirmwareVersion(c.getInt(c.getColumnIndex(ValidBtDevice.COLUMN_SOFT_VERSION)))
+                .setReleaseDate(new Date(c.getLong(c.getColumnIndex(ValidBtDevice.COLUMN_RELEASE_DATE))))
+                .setUserDefinedName(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_USER_DEVINED_NAME)))
+                .setTimeDiscovered(new Date(c.getLong(c.getColumnIndex(ValidBtDevice.COLUMN_TIME_DISCOVERED))))
+                .setTimeLastConnected(new Date(c.getLong(c.getColumnIndex(ValidBtDevice.COLUMN_TIME_LAST_CONNECTED))))
+                .build();
+    }
 
     /**********************************************************************************************/
     /******************************  Insert/Update methods  ***************************************/

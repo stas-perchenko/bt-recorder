@@ -8,5 +8,6 @@
     <color name="text_regular">#222222</color>
     <color name="text_light">#656565</color>
     <color name="text_white">#FFFFFF</color>
+    <color name="text_red">#B04081</color>
     <color name="bg_section_title">#3090A0</color>
 </resources>
