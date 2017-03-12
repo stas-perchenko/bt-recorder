@@ -199,7 +199,7 @@ public class DeviceFounderImpl implements DeviceFounder {
     }
 
     private void handleUnknownDevice(DiscoveredBluetoothDevice device) throws Exception {
-        Log.d(TAG, String.format("===========  Start handling unknown discovered device. Address - %s, Name - %s, RSSI=%d =================",device.getDevice().getAddress(), device.getDevice().getName(), device.getRssi()));
+        Log.d(TAG, String.format("===========  Start handling unknown discovered device. Address - %s, Name - %s, RSSI=%d =================",device.getDevice().getAddress(), device.getDevice().getName(), device.getRSSI()));
 
         try {
             //---  Stop discovery process for performance reasons ---

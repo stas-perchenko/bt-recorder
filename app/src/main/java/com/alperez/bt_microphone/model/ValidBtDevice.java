@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import com.alperez.bt_microphone.ui.viewmodel.BtDeviceViewModel;
 import com.google.auto.value.AutoValue;
 
 import java.util.Date;
@@ -12,7 +13,7 @@ import java.util.Date;
  * Created by stanislav.perchenko on 3/9/2017.
  */
 @AutoValue
-public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, Cloneable {
+public abstract class ValidBtDevice extends BaseDbModel implements BtDeviceViewModel, Parcelable, Cloneable {
     public static final String TABLE_NAME = "valid_devices";
 
     public static final String COLUMN_ID = "id";
@@ -95,5 +96,43 @@ public abstract class ValidBtDevice extends BaseDbModel implements Parcelable, C
         public abstract Builder setBluetoothDevice(BluetoothDevice bluetoothDevice);
 
         public abstract ValidBtDevice build();
+    }
+
+
+    public void setRssi(short rssi) {
+        this.rssi = rssi;
+    }
+    /*********************  the BtDeviceViewModel implementation  *********************************/
+    private short rssi;
+    @Override
+    public int getDeviceType() {
+        return BtDeviceViewModel.DEVICE_TYPE_VALID_SAVED;
+    }
+
+    @Override
+    public String getName() {
+        return deviceName();
+    }
+
+    @Override
+    public String getMacAddress() {
+        return macAddress();
+    }
+
+    @Override
+    public short getRSSI() {
+        return rssi;
+    }
+
+    @Nullable
+    @Override
+    public Date getTimeFirstDiscovered() {
+        return timeDiscovered();
+    }
+
+    @Nullable
+    @Override
+    public BluetoothDevice getDevice() {
+        return bluetoothDevice();
     }
 }

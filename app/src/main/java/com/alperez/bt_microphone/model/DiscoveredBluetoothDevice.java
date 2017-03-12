@@ -1,12 +1,17 @@
 package com.alperez.bt_microphone.model;
 
 import android.bluetooth.BluetoothDevice;
+import android.support.annotation.Nullable;
+
+import com.alperez.bt_microphone.ui.viewmodel.BtDeviceViewModel;
+
+import java.util.Date;
 
 /**
  * Created by stanislav.perchenko on 3/10/2017.
  */
 
-public class DiscoveredBluetoothDevice {
+public class DiscoveredBluetoothDevice implements BtDeviceViewModel {
     private BluetoothDevice device;
     private short rssi;
 
@@ -15,11 +20,36 @@ public class DiscoveredBluetoothDevice {
         this.rssi = rssi;
     }
 
-    public BluetoothDevice getDevice() {
-        return device;
+
+    /*********************  the BtDeviceViewModel implementation  *********************************/
+    @Override
+    public int getDeviceType() {
+        return BtDeviceViewModel.DEVICE_TYPE_VALID_NEW;
     }
 
-    public short getRssi() {
+    @Override
+    public String getName() {
+        return device.getName();
+    }
+
+    @Override
+    public String getMacAddress() {
+        return device.getAddress();
+    }
+
+    @Override
+    public short getRSSI() {
         return rssi;
+    }
+
+    @Nullable
+    @Override
+    public Date getTimeFirstDiscovered() {
+        return null;
+    }
+
+    @Override
+    public BluetoothDevice getDevice() {
+        return device;
     }
 }
