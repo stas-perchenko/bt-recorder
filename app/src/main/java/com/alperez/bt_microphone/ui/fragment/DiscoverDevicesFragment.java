@@ -46,11 +46,6 @@ public class DiscoverDevicesFragment extends Fragment {
     private LayoutInflater inflater;
 
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
 
 
     @Override

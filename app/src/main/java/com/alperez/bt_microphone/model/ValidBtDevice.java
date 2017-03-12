@@ -58,6 +58,14 @@ public abstract class ValidBtDevice extends BaseDbModel implements BtDeviceViewM
 
     public abstract Builder toBuilder();
 
+    public ValidBtDevice withUserDefinedName(@Nullable String userDefinedName) {
+        return toBuilder().setUserDefinedName(userDefinedName).build();
+    }
+
+    public ValidBtDevice withTimeDiscovered(Date timeDiscovered) {
+        return toBuilder().setTimeDiscovered(timeDiscovered).build();
+    }
+
     public ValidBtDevice withBluetoothDevice(@Nullable BluetoothDevice device) {
         return toBuilder().setBluetoothDevice(device).build();
     }

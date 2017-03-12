@@ -135,6 +135,24 @@ public class DatabaseAdapter {
         return db.insert(BlacklistedBtDevice.TABLE_NAME, null, vals);
     }
 
+
+    public long insertValidDevice(ValidBtDevice device) {
+        ContentValues vals = new ContentValues();
+        vals.put(ValidBtDevice.COLUMN_MAC, device.macAddress());
+        vals.put(ValidBtDevice.COLUMN_ORIG_DEVICE_NAME, device.deviceName());
+        vals.put(ValidBtDevice.COLUMN_SERIAL_NUM, device.serialNumber());
+        vals.put(ValidBtDevice.COLUMN_HARD_VERSION, device.hardwareVersion());
+        vals.put(ValidBtDevice.COLUMN_SOFT_VERSION, device.firmwareVersion());
+        vals.put(ValidBtDevice.COLUMN_RELEASE_DATE, device.releaseDate().getTime());
+        vals.put(ValidBtDevice.COLUMN_USER_DEVINED_NAME, device.userDefinedName());
+        vals.put(ValidBtDevice.COLUMN_TIME_DISCOVERED, device.timeDiscovered().getTime());
+        if (device.timeLastConnected() != null) {
+            vals.put(ValidBtDevice.COLUMN_TIME_LAST_CONNECTED, device.timeLastConnected().getTime());
+        }
+
+        return db.insert(ValidBtDevice.TABLE_NAME, null, vals);
+    }
+
     public boolean updateValidDeviceTimeLastConnected(ValidBtDevice device) {
         String where = String.format("%s = %d", ValidBtDevice.COLUMN_ID, device.id());
         ContentValues vals = new ContentValues();

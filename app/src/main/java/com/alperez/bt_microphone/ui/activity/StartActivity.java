@@ -16,13 +16,14 @@ import com.alperez.bt_microphone.model.ValidBtDevice;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
 import com.alperez.bt_microphone.ui.Layout;
 import com.alperez.bt_microphone.ui.fragment.CheckKnownDevicesFragment;
+import com.alperez.bt_microphone.ui.fragment.CheckNewDeviceFragment;
 import com.alperez.bt_microphone.ui.fragment.DiscoverDevicesFragment;
 
 import java.util.List;
 import java.util.Map;
 
 @Layout(value = R.layout.activity_start)
-public class StartActivity extends BaseActivity implements DiscoverDevicesFragment.BluetoothAdapterProvider, DiscoverDevicesFragment.OnDeviceSelectionResultListener {
+public class StartActivity extends BaseActivity implements DiscoverDevicesFragment.BluetoothAdapterProvider, DiscoverDevicesFragment.OnDeviceSelectionResultListener, CheckNewDeviceFragment.OnDeviceFerifiedListener {
 
 
     BluetoothAdapter btAdapter;
@@ -121,7 +122,25 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
 
     @Override
     public void onNewDeviceSelected(DiscoveredBluetoothDevice device) {
-        Toast.makeText(this, "New device selected - "+device.getMacAddress(), Toast.LENGTH_LONG).show();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        if ((currFragment != null) && (currFragment instanceof CheckNewDeviceFragment)) {
+            ft.remove(currFragment);
+            allFragments.remove(CheckNewDeviceFragment.class.getName());
+            currFragment = null;
+        } else if (currFragment != null) {
+            ft.detach(currFragment);
+        }
+
+        Fragment f = allFragments.get(CheckNewDeviceFragment.class.getName());
+        if (f != null) {
+            ((CheckNewDeviceFragment) f).setArgDevice(device);
+            ft.attach(f);
+        } else {
+            f = CheckNewDeviceFragment.newInstance(device);
+            allFragments.put(CheckNewDeviceFragment.class.getName(), f);
+            ft.add(R.id.children_fragments_container, f);
+        }
+        ft.commit();
     }
 
     @Override
@@ -129,6 +148,20 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
         goToMainActivity(device);
     }
 
+
+
+
+
+    /**********************  Interfaces for Check device Fragment  ********************************/
+    @Override
+    public void onDeveiceVerified(ValidBtDevice device) {
+        goToMainActivity(device);
+    }
+
+    @Override
+    public void onErrorVerification(DiscoveredBluetoothDevice device) {
+        //TODO Show error and ask question!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    }
 
 
 
