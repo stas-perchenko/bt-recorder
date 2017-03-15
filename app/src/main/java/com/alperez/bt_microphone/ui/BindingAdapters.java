@@ -1,6 +1,7 @@
 package com.alperez.bt_microphone.ui;
 
 import android.databinding.BindingAdapter;
+import android.databinding.BindingConversion;
 import android.support.design.widget.TextInputLayout;
 import android.view.View;
 import android.widget.ImageView;
@@ -8,6 +9,8 @@ import android.widget.TextView;
 
 import com.alperez.bt_microphone.R;
 import com.alperez.bt_microphone.ui.viewmodel.BtDeviceViewModel;
+
+import java.util.Date;
 
 /**
  * Created by stanislav.perchenko on 3/9/2017.
@@ -41,5 +44,20 @@ public class BindingAdapters {
             tv.setText(String.format(((rssi >= 0) ? "+%d dBm" : "-%d dBm"), rssi));
         }
     }
+
+
+    @BindingAdapter("intValueAsText")
+    public static void setTextView_IntValue(TextView tv, int value) {
+        tv.setText(Integer.toString(value));
+    }
+
+
+
+    /********************************  Automatic Conversions  *************************************/
+    @BindingConversion
+    public static String convertToString(Date d) {
+        return String.format("%1$td-%1$tm-%1$tY", d);
+    }
+
 
 }

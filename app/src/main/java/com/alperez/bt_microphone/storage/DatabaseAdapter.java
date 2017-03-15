@@ -138,6 +138,7 @@ public class DatabaseAdapter {
 
     public long insertValidDevice(ValidBtDevice device) {
         ContentValues vals = new ContentValues();
+        vals.put(ValidBtDevice.COLUMN_ID, device.id());
         vals.put(ValidBtDevice.COLUMN_MAC, device.macAddress());
         vals.put(ValidBtDevice.COLUMN_ORIG_DEVICE_NAME, device.deviceName());
         vals.put(ValidBtDevice.COLUMN_SERIAL_NUM, device.serialNumber());
@@ -158,6 +159,15 @@ public class DatabaseAdapter {
         ContentValues vals = new ContentValues();
         vals.put(ValidBtDevice.COLUMN_TIME_LAST_CONNECTED, device.timeLastConnected().getTime());
         return (db.update(ValidBtDevice.TABLE_NAME, vals, where, null) > 0);
+    }
+
+
+    public int clearValidDevices() {
+        return db.delete(ValidBtDevice.TABLE_NAME, null, null);
+    }
+
+    public int clearBlacklistedDevices() {
+        return db.delete(BlacklistedBtDevice.TABLE_NAME, null, null);
     }
 
 }

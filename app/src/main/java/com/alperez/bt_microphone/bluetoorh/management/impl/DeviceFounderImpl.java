@@ -21,12 +21,13 @@ import com.alperez.bt_microphone.model.BlacklistedBtDevice;
 import com.alperez.bt_microphone.model.DiscoveredBluetoothDevice;
 import com.alperez.bt_microphone.model.ValidBtDevice;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
-import com.alperez.bt_microphone.utils.RunnableSequantialExecuter;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by stanislav.perchenko on 3/10/2017.
@@ -38,13 +39,13 @@ public class DeviceFounderImpl implements DeviceFounder {
 
     private final Object lockInstance = new Object();
 
-    //private BluetoothAdapter btAdapter;
     private Context context;
     private DeviceDiscovery deviceDiscovery;
     private OnDeviceFoundListener devFoundListener;
 
-    private RunnableSequantialExecuter sequantialExecuter;
+
     private DatabaseAdapter dbAdapter;
+    private ExecutorService sequantialExecuter;
 
     private volatile boolean isDiscoveryStated;
     private volatile boolean isThisStarted;
@@ -74,8 +75,22 @@ public class DeviceFounderImpl implements DeviceFounder {
     public void start() {
         if (released) throw new IllegalStateException("Already released");
         synchronized (lockInstance) {
+
+
             if (sequantialExecuter == null) {
-                sequantialExecuter = new RunnableSequantialExecuter();
+                sequantialExecuter = Executors.newSingleThreadExecutor();
+                Log.d(TAG, "Create executor");
+                sequantialExecuter.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(14000);
+                            Log.d(TAG, "End initial delay task");
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                });
             }
             if (dbAdapter == null) {
                 dbAdapter = new DatabaseAdapter();
@@ -86,6 +101,8 @@ public class DeviceFounderImpl implements DeviceFounder {
             }
             isThisStarted = true;
             startDiscovery();
+
+            Log.d(TAG, "|||||||||||||||||||   DeviceFounder start  |||||||||||||||||||||||||");
         }
     }
 
@@ -96,6 +113,13 @@ public class DeviceFounderImpl implements DeviceFounder {
             isThisStarted = false;
             stopDiscovery();
             handledMACs.clear();
+
+            if (sequantialExecuter != null) {
+                sequantialExecuter.shutdownNow();
+                sequantialExecuter = null;
+            }
+
+            Log.d(TAG, "|||||||||||||||||||   DeviceFounder STOP  |||||||||||||||||||||||||");
         }
     }
 
@@ -108,16 +132,16 @@ public class DeviceFounderImpl implements DeviceFounder {
             synchronized (lockInstance) {
                 stop();
                 deviceDiscovery.release();
-                if (sequantialExecuter != null) {
-                    sequantialExecuter.release();
-                }
+
                 if (dbAdapter != null) {
                     dbAdapter.close();
+                    dbAdapter = null;
                 }
                 if (uuidReceiverRegisterred) {
                     context.unregisterReceiver(mUuidReceiver);
                 }
                 released = true;
+                Log.d(TAG, "<<<<<<<<<<<<<<<<  Device founder released  >>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             }
         }
     }
@@ -156,22 +180,29 @@ public class DeviceFounderImpl implements DeviceFounder {
     }
 
     @Override
-    public void onDeviceDiscovered(DiscoveredBluetoothDevice device) {
+    public void onDeviceDiscovered(final DiscoveredBluetoothDevice device) {
         if (handledMACs.contains(device.getDevice().getAddress())) {
-            Log.d(TAG, "A device is discovered but already handled - "+device.getDevice().getAddress());
+            Log.d(TAG, "~~~~~~>>>  A device is discovered but already handled - "+device.getDevice().getAddress());
             return;
+        } else {
+            Log.d(TAG, "======>>>  onDeviceDiscovered() - "+device.getDevice().getAddress()+"   Enqueue new test!");
+            handledMACs.add(device.getDevice().getAddress());
+            sequantialExecuter.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        doJobOnDiscoveredDevice(device);
+                    } catch (Exception e) {
+                        Log.e(TAG, "~~~~~~~~~~~~~  Error processing device: "+device.getDevice().getAddress());
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
 
-        handledMACs.add(device.getDevice().getAddress());
 
-        sequantialExecuter.enqueueRunnable(() -> {
-            try {
-                doJobOnDiscoveredDevice(device);
-            } catch (Exception e) {
-                Log.e(TAG, "~~~~~~~~~~~~~  Error processing device: "+device.getDevice().getAddress());
-                e.printStackTrace();
-            }
-        });
+
+
     }
 
     /**
@@ -182,15 +213,18 @@ public class DeviceFounderImpl implements DeviceFounder {
      */
     private void doJobOnDiscoveredDevice(DiscoveredBluetoothDevice device) throws Exception {
         long deviceId = BlacklistedBtDevice.create(device.getDevice().getAddress(), null, new Date(), null).id();
+        Log.d(TAG, String.format("===========  Start handling discovered device. Address - %s, Name - %s, RSSI=%d =================",device.getDevice().getAddress(), device.getDevice().getName(), device.getRSSI()));
 
         BlacklistedBtDevice blackDev = dbAdapter.selectBlacklistedDeviceById(deviceId);
         if (blackDev != null) {
+            Log.e(TAG, "This device is in the Blacklist");
             resultHandlerToUi.sendMessage(resultHandlerToUi.obtainMessage(0, blackDev));
             return;
         }
 
         ValidBtDevice validDev = dbAdapter.selectValidDeviceById(deviceId);
         if (validDev != null) {
+            Log.e(TAG, "This device is already known");
             resultHandlerToUi.sendMessage(resultHandlerToUi.obtainMessage(0, validDev));
             return;
         }
@@ -199,7 +233,7 @@ public class DeviceFounderImpl implements DeviceFounder {
     }
 
     private void handleUnknownDevice(DiscoveredBluetoothDevice device) throws Exception {
-        Log.d(TAG, String.format("===========  Start handling unknown discovered device. Address - %s, Name - %s, RSSI=%d =================",device.getDevice().getAddress(), device.getDevice().getName(), device.getRSSI()));
+        Log.d(TAG, "Start handling unknown device: "+device.getMacAddress());
 
         try {
             //---  Stop discovery process for performance reasons ---
@@ -226,7 +260,7 @@ public class DeviceFounderImpl implements DeviceFounder {
                 if (uuidCondensor.hasAllUUIDs(GlobalConstants.ALL_SERVICE_UUIDS)) {
                     Log.d(TAG, "--------===  Result OK! All UUIDs were found  ===----------");
                     resultHandlerToUi.sendMessage(resultHandlerToUi.obtainMessage(0, device));
-                    break;
+                    return;
                 }
 
                 synchronized (uuidCondensor) {
@@ -242,11 +276,10 @@ public class DeviceFounderImpl implements DeviceFounder {
 
 
             //--- Save device to blacklist ---
-            if (uuidCondensor.getNumUUIDs() > 0) {
+            if (uuidCondensor.getNumUUIDs() > 0 || uuidCondensor.wasUUIDAnsverNull()) {
                 long res = dbAdapter.insertDeviceToBlacklist(BlacklistedBtDevice.create(device.getDevice().getAddress(), device.getDevice().getName(), new Date(), null));
                 Log.d(TAG, String.format("~~~~> Device was inserted to the blacklist: %s, ins res = %d ", device.getDevice().getAddress(), res));
             }
-
 
         } finally {
             //--- Start discovery process back ---
@@ -273,6 +306,7 @@ public class DeviceFounderImpl implements DeviceFounder {
         private BluetoothDevice trackingDevice;
         private long timeStartTracking;
         private long timeLastUUID;
+        private boolean uuidResponseNull;
 
         private Set<UUID> uuids = new HashSet<>();
 
@@ -302,6 +336,15 @@ public class DeviceFounderImpl implements DeviceFounder {
             return true;
         }
 
+        public synchronized void nullUuidResponse(BluetoothDevice device) {
+            if (trackingDevice == null) throw new IllegalStateException("No tracking device");
+            if (device != null && trackingDevice.getAddress().equals(device.getAddress())) {
+                //--- Force timeout to finish device processing ---
+                timeStartTracking = System.currentTimeMillis() - GlobalConstants.MAX_TIME_FOR_SDP + 100;
+                uuidResponseNull = true;
+            }
+        }
+
         public synchronized boolean hasAllUUIDs(UUID[] uuids) {
             for (UUID uuid : uuids) {
                 if (!this.uuids.contains(uuid)) {
@@ -321,6 +364,10 @@ public class DeviceFounderImpl implements DeviceFounder {
 
         public synchronized int getNumUUIDs() {
             return uuids.size();
+        }
+
+        public synchronized boolean wasUUIDAnsverNull() {
+            return uuidResponseNull;
         }
 
         public boolean isReady() {
@@ -363,6 +410,10 @@ public class DeviceFounderImpl implements DeviceFounder {
                     }
                 }
             } else {
+
+                uuidCondensor.nullUuidResponse(deviceExtra);
+
+
                 Log.e(TAG, String.format("~~~~>  ACTION_UUID for device - %s  UUID array is NULL!!!", deviceExtra.getAddress()));
             }
         }
@@ -385,6 +436,8 @@ public class DeviceFounderImpl implements DeviceFounder {
                 } else if ((msg.obj != null) && (msg.obj instanceof BlacklistedBtDevice)) {
                     devFoundListener.onBlacklistedDeviceFound((BlacklistedBtDevice) msg.obj);
                 } else if ((msg.obj != null) && (msg.obj instanceof DiscoveredBluetoothDevice)) {
+
+
                     devFoundListener.onNewRawDeviceFound((DiscoveredBluetoothDevice) msg.obj);
                 }
             }

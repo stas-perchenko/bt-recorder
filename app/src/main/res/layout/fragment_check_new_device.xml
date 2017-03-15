@@ -14,6 +14,10 @@
             type="com.alperez.bt_microphone.model.ValidBtDevice"/>
 
         <variable
+            name="uuid"
+            type="java.lang.String" />
+
+        <variable
             name="clickerApply"
             type="android.view.View.OnClickListener"/>
     </data>
@@ -25,13 +29,16 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin">
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:background="#FFFFFF">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="New device has been verified. You must name this device so it can be saved for future use."/>
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:text="New device verification stage"/>
 
         <TableLayout
             android:layout_width="match_parent"
@@ -64,16 +71,32 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="Dev Name:"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:text="@{device.deviceName}"/>
+            </TableRow>
+
+            <!-- Device name -->
+            <!--TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:text="Device name"/>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:text="@{device.deviceName()}"/>
-            </TableRow>
+            </TableRow-->
 
             <!-- Serial number -->
-            <TableRow
+            <!--TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp">
@@ -86,7 +109,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:text="@{device.serialNumber()}"/>
-            </TableRow>
+            </TableRow-->
 
             <!-- Hard version -->
             <TableRow
@@ -101,7 +124,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                    android:text="@{device.hardwareVersion()}"/>
+                    app:intValueAsText="@{device.hardwareVersion()}"/>
             </TableRow>
 
             <!-- Soft version -->
@@ -113,11 +136,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Firmvare version"/>
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                    android:text="@{device.firmwareVersion()}"/>
+                    app:intValueAsText="@{device.firmwareVersion()}"/>
             </TableRow>
 
             <!-- Release date -->
@@ -133,11 +157,131 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                    android:text="@{String.format(FormatUtils.UI_DATE_FORMAT_RU, device.releaseDate())}"/>
+                    android:text="@{device.releaseDate()}"/>
+            </TableRow>
+
+
+            <!-- UUID (remove after tests) -->
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_red"
+                    android:text="UUID:"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:text="@{uuid}"/>
             </TableRow>
 
 
         </TableLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#454545"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_gravity="center_horizontal"
+            android:textStyle="bold"
+            android:text="Check completion"/>
+
+
+
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Open port"/>
+            <ProgressBar android:id="@+id/progress_stage_1"
+                style="@android:style/Widget.ProgressBar.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:indeterminate="true"/>
+            <ImageView android:id="@+id/check_stage_1"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_weight="0"
+                android:layout_marginRight="0dp"
+                android:background="@drawable/check_indicator"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Send data"/>
+            <ProgressBar android:id="@+id/progress_stage_2"
+                style="@android:style/Widget.ProgressBar.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:indeterminate="true"/>
+            <ImageView android:id="@+id/check_stage_2"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_weight="0"
+                android:layout_marginRight="0dp"
+                android:background="@drawable/check_indicator"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Close port"/>
+            <ProgressBar android:id="@+id/progress_stage_3"
+                style="@android:style/Widget.ProgressBar.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:indeterminate="true"/>
+            <ImageView android:id="@+id/check_stage_3"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_weight="0"
+                android:layout_marginRight="0dp"
+                android:background="@drawable/check_indicator"/>
+        </LinearLayout>
+
+
+
+
+
 
 
         <TextView

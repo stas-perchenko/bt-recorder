@@ -13,4 +13,6 @@
     <string name="action_connect_last_device">Connect</string>
     <string name="action_check_known_devices">Check known devices</string>
     <string name="action_search_new_devices">Search new devices</string>
+
+    <string name="action_clear_db">Clear device cache</string>
 </resources>

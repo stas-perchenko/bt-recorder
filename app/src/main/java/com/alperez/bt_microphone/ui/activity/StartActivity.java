@@ -5,12 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.alperez.bt_microphone.R;
 import com.alperez.bt_microphone.bluetoorh.BluetoothNotSupportedException;
 import com.alperez.bt_microphone.bluetoorh.BtUtils;
+import com.alperez.bt_microphone.bluetoorh.management.DeviceFounder;
+import com.alperez.bt_microphone.bluetoorh.management.impl.DeviceFounderImpl;
 import com.alperez.bt_microphone.model.DiscoveredBluetoothDevice;
 import com.alperez.bt_microphone.model.ValidBtDevice;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
@@ -19,6 +23,7 @@ import com.alperez.bt_microphone.ui.fragment.CheckKnownDevicesFragment;
 import com.alperez.bt_microphone.ui.fragment.CheckNewDeviceFragment;
 import com.alperez.bt_microphone.ui.fragment.DiscoverDevicesFragment;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +35,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
     private List<ValidBtDevice> savedDevices;
 
 
-    private Map<String, Fragment> allFragments;
+    private Map<String, Fragment> allFragments = new HashMap<>();
     private Fragment currFragment;
 
 
@@ -49,7 +54,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
         }
 
         savedDevices = selectSavedDevices();
-        setKnownDevicesGroupVisible(savedInstanceState.size() > 0);
+        setKnownDevicesGroupVisible(savedDevices.size() > 0);
 
         findViewById(R.id.btn_connect_last).setOnClickListener(v -> goToMainActivity(savedDevices.get(0)));
         findViewById(R.id.btn_check_known).setOnClickListener(v -> showCheckKnownDevicesFragment());
@@ -85,6 +90,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
             allFragments.put(CheckKnownDevicesFragment.class.getName(), f);
             ft.add(R.id.children_fragments_container, f);
         }
+        currFragment = f;
         ft.commit();
     }
 
@@ -108,6 +114,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
             allFragments.put(DiscoverDevicesFragment.class.getName(), f);
             ft.add(R.id.children_fragments_container, f);
         }
+        currFragment = f;
         ft.commit();
     }
 
@@ -125,7 +132,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if ((currFragment != null) && (currFragment instanceof CheckNewDeviceFragment)) {
             ft.remove(currFragment);
-            allFragments.remove(CheckNewDeviceFragment.class.getName());
+            CheckNewDeviceFragment removedFragment = (CheckNewDeviceFragment) allFragments.remove(CheckNewDeviceFragment.class.getName());
             currFragment = null;
         } else if (currFragment != null) {
             ft.detach(currFragment);
@@ -140,6 +147,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
             allFragments.put(CheckNewDeviceFragment.class.getName(), f);
             ft.add(R.id.children_fragments_container, f);
         }
+        currFragment = f;
         ft.commit();
     }
 
@@ -190,6 +198,46 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
 
 
 
+    /**********************************************************************************************/
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.menu_clear_db, menu);
+        return true;
+    }
 
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.action_clear_db:
+                clearDeviceCache();
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    private void clearDeviceCache() {
+        DatabaseAdapter db = new DatabaseAdapter();
+        try {
+            db.beginTransaction();
+
+            int nValid = db.clearValidDevices();
+            int nBlack = db.clearBlacklistedDevices();
+            Log.d(DeviceFounderImpl.TAG, String.format("Device cache was cleared. N valid = %d, N blacklisted = %d", nValid, nBlack));
+            db.commitTransaction();
+        } finally {
+            db.endTransaction();
+            db.close();
+
+
+        }
+    }
 }

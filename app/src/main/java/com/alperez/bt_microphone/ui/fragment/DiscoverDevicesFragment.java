@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,7 @@ public class DiscoverDevicesFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.d(DeviceFounderImpl.TAG, "Fragment.onAttach()");
         if (!(context instanceof BluetoothAdapterProvider)) {
             throw new IllegalStateException("A host activity must implement the BluetoothAdapterProvider");
         } else if (!(context instanceof OnDeviceSelectionResultListener)) {
@@ -59,7 +61,6 @@ public class DiscoverDevicesFragment extends Fragment {
             btProvider = (BluetoothAdapterProvider) context;
             resultListener = (OnDeviceSelectionResultListener) context;
         }
-
 
         if (deviceFounder == null) {
             deviceFounder = new DeviceFounderImpl(context, new DeviceDiscoveryImpl(context, btProvider.getBluetoothAdapter()));
@@ -80,14 +81,19 @@ public class DiscoverDevicesFragment extends Fragment {
                 }
             });
         }
-
     }
 
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(DeviceFounderImpl.TAG, "Fragment.onCreate()");
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(DeviceFounderImpl.TAG, "Fragment.onCreateView()");
         this.inflater = inflater;
         if (vBinding == null) {
             vBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_devices_discovery, container, false);
@@ -101,16 +107,35 @@ public class DiscoverDevicesFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(DeviceFounderImpl.TAG, "Fragment.onViewCreated()");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(DeviceFounderImpl.TAG, "Fragment.onStart()");
         deviceFounder.start();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(DeviceFounderImpl.TAG, "Fragment.onStop()");
+        deviceFounder.stop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(DeviceFounderImpl.TAG, "Fragment.onDestroy()");
+        deviceFounder.release();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        deviceFounder.stop();
+        Log.d(DeviceFounderImpl.TAG, "Fragment.onDetach()");
     }
-
-
 
     private void clearUi() {
         vBinding.sectionOtherDevices.setVisibility(View.GONE);
