@@ -1,10 +1,12 @@
 package com.alperez.bt_microphone.ui.activity;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -167,8 +169,16 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
     }
 
     @Override
-    public void onErrorVerification(DiscoveredBluetoothDevice device) {
-        //TODO Show error and ask question!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    public void onErrorVerification(DiscoveredBluetoothDevice device, Throwable error) {
+
+        new AlertDialog.Builder(this).setTitle("Verification failed").setMessage("Error details - "+error.getMessage()).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        }).show();
+
+
     }
 
 

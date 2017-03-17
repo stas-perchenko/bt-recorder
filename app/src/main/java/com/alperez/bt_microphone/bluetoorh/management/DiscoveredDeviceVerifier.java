@@ -1,14 +1,20 @@
 package com.alperez.bt_microphone.bluetoorh.management;
 
+import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.alperez.bt_microphone.GlobalConstants;
+import com.alperez.bt_microphone.bluetoorh.BtUtils;
 import com.alperez.bt_microphone.model.DiscoveredBluetoothDevice;
 import com.alperez.bt_microphone.model.ValidBtDevice;
 import com.alperez.bt_microphone.utils.Callback;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 
 /**
@@ -16,6 +22,8 @@ import java.util.Date;
  */
 
 public class DiscoveredDeviceVerifier {
+
+    public static final String TAG = "DeviceVerifier";
 
 
     private final DiscoveredBluetoothDevice device;
@@ -49,8 +57,10 @@ public class DiscoveredDeviceVerifier {
                     ValidBtDevice result = doTheJobBackground();
                     resultHandler.obtainMessage(0, result).sendToTarget();
                 } catch (InterruptedException e) {
+                    Log.e(TAG, "Verifier thread was interrupted - "+e.getMessage());
                     // Do nothing in this case
                 } catch (Exception e) {
+                    Log.e(TAG, "Verifier has finished with error - "+e.getMessage());
                     e.printStackTrace();
                     resultHandler.obtainMessage(0, e).sendToTarget();
                 }
@@ -82,20 +92,51 @@ public class DiscoveredDeviceVerifier {
 
         //--- Stage 1 ---
         resultHandler.obtainMessage(MSG_STAGE_1_START).sendToTarget();
-        Thread.sleep(450);
+        //Thread.sleep(450);
+        BluetoothSocket soc = null;
+        try {
+            Log.d(TAG, "Create socket");
+            soc = device.getDevice().createRfcommSocketToServiceRecord(GlobalConstants.UUID_SERVICE_1_1);
+            Log.d(TAG, "Socket.connect()");
+            soc.connect();
+        } catch (IOException connectException) {
+            BtUtils.silentCloseBtSocket(soc);
+            throw connectException;
+        }
         resultHandler.obtainMessage(MSG_STAGE_1_COMPLETE).sendToTarget();
+        if (released) {
+            throw new InterruptedException("Manually released");
+        }
 
         //--- Stage 2 ---
         Thread.sleep(80);
         resultHandler.obtainMessage(MSG_STAGE_2_START).sendToTarget();
-        Thread.sleep(3450);
+        OutputStream os = null;
+        try {
+            Log.d(TAG, "Get OutputStream from the socket");
+            os = soc.getOutputStream();
+            for (int i=0; i<10; i++) {
+                if (released) {
+                    throw new InterruptedException("Manually released");
+                }
+                Log.d(TAG, "Sending 'Hello world' ...");
+                os.write("{\"id\": 1,\"command\": \"status\"}\r\n".getBytes());
+                os.flush();
+                Log.d(TAG, "... OK");
+                Thread.sleep(800);
+            }
+        } finally {
+            Log.d(TAG, "Close OutputStream");
+            BtUtils.silentlyCloseCloseable(os);
+        }
         resultHandler.obtainMessage(MSG_STAGE_2_COMPLETE).sendToTarget();
 
 
         //--- Stage 3 ---
-        Thread.sleep(80);
         resultHandler.obtainMessage(MSG_STAGE_3_START).sendToTarget();
-        Thread.sleep(450);
+        Log.d(TAG, "Close socket");
+        BtUtils.silentCloseBtSocket(soc);
+        Thread.sleep(250);
         resultHandler.obtainMessage(MSG_STAGE_3_COMPLETE).sendToTarget();
 
 

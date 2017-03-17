@@ -32,7 +32,7 @@ public class CheckNewDeviceFragment extends Fragment {
 
     public interface OnDeviceFerifiedListener {
         void onDeveiceVerified(ValidBtDevice device);
-        void onErrorVerification(DiscoveredBluetoothDevice device);
+        void onErrorVerification(DiscoveredBluetoothDevice device, Throwable error);
     }
 
     public static CheckNewDeviceFragment newInstance(DiscoveredBluetoothDevice newDevice) {
@@ -184,7 +184,7 @@ public class CheckNewDeviceFragment extends Fragment {
             public void onError(Throwable error) {
                 controller = null;
                 //fullScreenProgress.dismissFullScreenProgress();
-                resultListener.onErrorVerification(device);
+                resultListener.onErrorVerification(device, error);
             }
         });
     }

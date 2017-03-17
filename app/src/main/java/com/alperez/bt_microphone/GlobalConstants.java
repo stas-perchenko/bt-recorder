@@ -11,10 +11,11 @@ public class GlobalConstants {
     public static final int DB_VERSION = 3;
 
 
-    //public static final UUID UUID_SERVICE_1 = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-    //public static final UUID UUID_SERVICE_2 = UUID.fromString("6705ef4c-eb38-49a2-9a7b-679e065ab3d6");
+    public static final UUID UUID_SERVICE_1_1 = UUID.fromString("11111111-eb38-49a2-9a7b-679e52aeb3d6");
 
+    //public static final UUID UUID_SERVICE_1 = UUID.fromString("d6b3ae52-9e67-7b9a-a249-38eb11111111");
     public static final UUID UUID_SERVICE_1 = UUID.fromString("11111111-eb38-49a2-9a7b-679e52aeb3d6");
+
     //public static final UUID UUID_SERVICE_2 = UUID.fromString("22222222-eb38-49a2-45d0-679e52aeb3d6");
 
     public static final UUID[] ALL_SERVICE_UUIDS = {UUID_SERVICE_1/*, UUID_SERVICE_2*/};
