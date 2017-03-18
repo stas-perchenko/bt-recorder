@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
 import com.alperez.bt_microphone.bluetoorh.BtUtils;
+import com.alperez.bt_microphone.utils.ThreadLog;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,6 +16,7 @@ import java.util.concurrent.Executors;
  */
 
 public class BtConnector {
+    public static final String TAG = "BtTransConnector";
 
 
     public static BtConnector forDevice(BluetoothDevice device, UUID serviceUUID) {
@@ -45,6 +47,7 @@ public class BtConnector {
         this.callback = callback;
 
         Executors.newSingleThreadExecutor().submit(() -> execute());
+        ThreadLog.d(TAG, "Connector created");
         return this;
     }
 
@@ -53,6 +56,16 @@ public class BtConnector {
      * This is the actual background worker
      */
     private void execute() {
+
+        ThreadLog.d(TAG, "Connector execution started");
+        if (preConnectionDelay > 0) {
+            try {
+                Thread.sleep(preConnectionDelay);
+            } catch (InterruptedException ignore) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
         BluetoothSocket soc = null;
         InputStream is = null;
         OutputStream os = null;
@@ -63,14 +76,17 @@ public class BtConnector {
             is = soc.getInputStream();
             os = soc.getOutputStream();
         } catch (Exception e) {
+            ThreadLog.e(TAG, "Connector execution failed - "+e.getMessage());
             BtUtils.silentlyCloseCloseable(is);
             BtUtils.silentlyCloseCloseable(os);
             BtUtils.silentlyCloseCloseable(soc);
             err = e;
         } finally {
             if (err == null) {
+                ThreadLog.d(TAG, "Connector execution finished OK -> return result");
                 callback.onConnected(soc, is, os);
             } else {
+                ThreadLog.e(TAG, "Connector execution finished ERROR -> report error");
                 callback.onConnectionFailure(err);
             }
         }

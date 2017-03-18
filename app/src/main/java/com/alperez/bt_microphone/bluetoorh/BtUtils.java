@@ -67,8 +67,8 @@ public class BtUtils {
             }
             byte[] nData = new byte[newLen + 2];
             System.arraycopy(origData, 0, nData, 0, newLen);
-            nData[newLen-2] = 0x0D;
-            nData[newLen-1] = 0x0A;
+            nData[newLen+0] = 0x0D;
+            nData[newLen+1] = 0x0A;
             return nData;
         }
     }

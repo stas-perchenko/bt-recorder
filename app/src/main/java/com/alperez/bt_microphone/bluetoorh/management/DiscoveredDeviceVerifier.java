@@ -88,8 +88,8 @@ public class DiscoveredDeviceVerifier {
 
     private ValidBtDevice doTheJobBackground() throws Exception {
         //--- Initial delay ---
-        Thread.sleep(350);
-
+        Thread.sleep(3500);
+/*
         //--- Stage 1 ---
         resultHandler.obtainMessage(MSG_STAGE_1_START).sendToTarget();
         //Thread.sleep(450);
@@ -139,7 +139,7 @@ public class DiscoveredDeviceVerifier {
         Thread.sleep(250);
         resultHandler.obtainMessage(MSG_STAGE_3_COMPLETE).sendToTarget();
 
-
+*/
         return ValidBtDevice.builder()
                 .setMacAddress(device.getDevice().getAddress())
                 .setDeviceName(device.getDevice().getName())
