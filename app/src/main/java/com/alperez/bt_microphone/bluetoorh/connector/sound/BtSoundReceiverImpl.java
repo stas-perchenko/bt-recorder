@@ -45,7 +45,7 @@ public class BtSoundReceiverImpl implements BtSoundReceiver {
 
     //----  Receiver-related section  ----
     private final ReceivingThread rcvThread;
-    private final OnBinaryDataReceivedListener rcvListener;
+    private final OnSoundDataReceivedListener rcvListener;
     private final byte[] receiverResultdataBuffer = new byte[RCV_BUFF_SIZE];
 
 
@@ -55,7 +55,7 @@ public class BtSoundReceiverImpl implements BtSoundReceiver {
 
     /**********************************  Public API section  **************************************/
 
-    public BtSoundReceiverImpl(@NonNull BluetoothDevice device, @NonNull UUID serviceUUID, @NonNull OnBinaryDataReceivedListener rcvListener) {
+    public BtSoundReceiverImpl(@NonNull BluetoothDevice device, @NonNull UUID serviceUUID, @NonNull OnSoundDataReceivedListener rcvListener) {
         if (device == null) throw new IllegalArgumentException("BluetoothDevice cannot be null");
         if (serviceUUID == null) throw new IllegalArgumentException("Service UUID cannot be null");
         if (rcvListener == null) throw new IllegalArgumentException("Listener cannot be null");
@@ -243,9 +243,30 @@ public class BtSoundReceiverImpl implements BtSoundReceiver {
                 if (localIS != null && !released) {
                     byte[] buffer = new byte[RCV_BUFF_SIZE];
                     int nBytes;
+
+
+                    long tStart = 0;
+                    int cntrBytes = 0;
+
+
                     while(true) {
                         try {
                             nBytes = localIS.read(buffer);
+
+                            long currT = System.currentTimeMillis();
+                            long dt = currT - tStart;
+                            if (tStart == 0) {
+                                tStart = currT;
+                                cntrBytes = 0;
+                            } else {
+                                cntrBytes += nBytes;
+                                if (dt > 1600) {
+                                    rcvListener.onDataRateMeasured(cntrBytes*1000f / dt);
+                                    tStart = 0;
+                                }
+                            }
+
+
 
                             //ThreadLog.d(TAG, nBytes+" received");
 

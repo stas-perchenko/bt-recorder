@@ -17,6 +17,7 @@ import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiver;
 import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiverImpl;
 import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundReceiver;
 import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundReceiverImpl;
+import com.alperez.bt_microphone.bluetoorh.connector.sound.OnSoundDataReceivedListener;
 import com.alperez.bt_microphone.model.ValidBtDevice;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
 import com.alperez.bt_microphone.ui.Layout;
@@ -51,6 +52,7 @@ public class MainActivity extends BaseActivity {
     private TextView vTxtCommandConnTry;
 
     private TextView vTxtNumSoundBytes;
+    private TextView vTxtSoundDataRate;
     private View vSoundConnStatus;
     private TextView vTxtSoundConnTry;
 
@@ -90,9 +92,17 @@ public class MainActivity extends BaseActivity {
             });
 
             getWindow().getDecorView().postDelayed(() -> {
-                deviceReceiverSound = new BtSoundReceiverImpl(device, GlobalConstants.UUID_SERVICE_2, (data, offset, nBytes) -> {
-                    soundBytesCounter += nBytes;
-                    getWindow().getDecorView().post(() -> vTxtNumSoundBytes.setText(""+soundBytesCounter));
+                deviceReceiverSound = new BtSoundReceiverImpl(device, GlobalConstants.UUID_SERVICE_2, new OnSoundDataReceivedListener() {
+                    @Override
+                    public void onDataReceiver(byte[] buffer, int offcet, int nBytes) {
+                        soundBytesCounter += nBytes;
+                        getWindow().getDecorView().post(() -> vTxtNumSoundBytes.setText(""+soundBytesCounter));
+                    }
+
+                    @Override
+                    public void onDataRateMeasured(float bps) {
+                        getWindow().getDecorView().post(() -> vTxtSoundDataRate.setText(String.format("%.1f bps", bps)));
+                    }
                 });
                 deviceReceiverSound.setOnTransceiverStatusListener(new OnTransceiverStatusListener() {
                     @Override
@@ -128,6 +138,7 @@ public class MainActivity extends BaseActivity {
         vTxtCommandConnTry = (TextView) findViewById(R.id.command_conn_try);
 
         vTxtNumSoundBytes = (TextView) findViewById(R.id.sound_num_bytes);
+        vTxtSoundDataRate = (TextView) findViewById(R.id.sound_data_rate);
         vSoundConnStatus = findViewById(R.id.sound_conn_status);
         vTxtSoundConnTry = (TextView) findViewById(R.id.sound_conn_try);
 
