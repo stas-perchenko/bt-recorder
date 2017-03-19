@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.alperez.bt_microphone.bluetoorh.BtUtils;
 import com.alperez.bt_microphone.bluetoorh.connector.BtConnector;
-import com.alperez.bt_microphone.bluetoorh.connector.OnTransceiverStatusListener;
+import com.alperez.bt_microphone.bluetoorh.connector.OnConnectionStatusListener;
 import com.alperez.bt_microphone.utils.ThreadLog;
 
 import java.io.IOException;
@@ -15,6 +15,8 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 /**
+ * This is for testing
+ *
  * Created by stanislav.perchenko on 3/18/2017.
  */
 
@@ -51,7 +53,7 @@ public class BtSoundReceiverImpl implements BtSoundReceiver {
 
     //----  Transceiver status notification section ---
     private final Object statusListenerLock = new Object();
-    private OnTransceiverStatusListener statusListener;
+    private OnConnectionStatusListener statusListener;
 
     /**********************************  Public API section  **************************************/
 
@@ -72,7 +74,7 @@ public class BtSoundReceiverImpl implements BtSoundReceiver {
     }
 
     @Override
-    public void setOnTransceiverStatusListener(OnTransceiverStatusListener l) {
+    public void setOnTransceiverStatusListener(OnConnectionStatusListener l) {
         synchronized (statusListenerLock) {
             statusListener = l;
         }

@@ -1,22 +1,27 @@
 package com.alperez.bt_microphone.ui.activity;
 
 import android.bluetooth.BluetoothDevice;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.alperez.bt_microphone.GlobalConstants;
 import com.alperez.bt_microphone.R;
 import com.alperez.bt_microphone.bluetoorh.BluetoothNotSupportedException;
 import com.alperez.bt_microphone.bluetoorh.BtUtils;
-import com.alperez.bt_microphone.bluetoorh.connector.OnTransceiverStatusListener;
+import com.alperez.bt_microphone.bluetoorh.connector.OnConnectionStatusListener;
 import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiver;
 import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiverImpl;
-import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundReceiver;
-import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundReceiverImpl;
+import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundPlayer;
+import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundPlayerImpl;
+import com.alperez.bt_microphone.bluetoorh.connector.sound.OnPlayerPerformanceListener;
 import com.alperez.bt_microphone.model.ValidBtDevice;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
 import com.alperez.bt_microphone.ui.Layout;
@@ -42,7 +47,8 @@ public class MainActivity extends BaseActivity {
     private DataTransferArrayAdapter logAdapter;
 
     private BtDataTransceiver deviceTransceiverCommand;
-    private BtSoundReceiver deviceReceiverSound;
+    //private BtSoundReceiver deviceReceiverSound;
+    private BtSoundPlayer mPlayer;
 
     private int commandCounter;
 
@@ -50,11 +56,30 @@ public class MainActivity extends BaseActivity {
     private View vCommandConnStatus;
     private TextView vTxtCommandConnTry;
 
-    private TextView vTxtNumSoundBytes;
+    private TextView vTxtNumSoundBytesReceived;
+    private TextView vTxtNumSoundBytesPlayed;
     private View vSoundConnStatus;
-    private TextView vTxtSoundConnTry;
+    private TextView vTxtSoundNumReconnect;
+    private TextView vTxtSoundNumTryes;
 
-    private int soundBytesCounter;
+    private int soundBytesReceivedCounter;
+    private int soundBytesPlayedCounter;
+
+
+    private ToggleButton vBtnPlay, vBtnStop;
+
+    private boolean userRequestedPlay = true;
+
+
+    private AudioTrack createAudioTrack() {
+
+        int minBufSizeBytes = AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_8BIT);
+
+        minBufSizeBytes = 1024;
+
+        return new AudioTrack(AudioManager.STREAM_MUSIC, 8000, AudioFormat.CHANNEL_OUT_MONO,
+                AudioFormat.ENCODING_PCM_8BIT, 2*minBufSizeBytes, AudioTrack.MODE_STREAM);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,7 +97,7 @@ public class MainActivity extends BaseActivity {
             BluetoothDevice device = BtUtils.getBtAdapter(this).getRemoteDevice(mDevice.macAddress());
             mDevice.withBluetoothDevice(device);
             deviceTransceiverCommand = new BtDataTransceiverImpl(device, GlobalConstants.UUID_SERVICE_1, data -> getWindow().getDecorView().post(() -> logAdapter.add(DataTransferViewModel.createReceivedItem(new Date(), data))));
-            deviceTransceiverCommand.setOnTransceiverStatusListener(new OnTransceiverStatusListener() {
+            deviceTransceiverCommand.setOnTransceiverStatusListener(new OnConnectionStatusListener() {
                 @Override
                 public void onConnectionRestorted(int nTry) {
                     updateCommandConnectionState(true, nTry);
@@ -89,17 +114,55 @@ public class MainActivity extends BaseActivity {
                 }
             });
 
-            getWindow().getDecorView().postDelayed(() -> {
+
+            mPlayer = new BtSoundPlayerImpl(device, GlobalConstants.UUID_SERVICE_2, createAudioTrack());
+            mPlayer.setOnPlayerPerformanceListener(new OnPlayerPerformanceListener() {
+                @Override
+                public void onBytesReceived(int nBytes) {
+                    soundBytesReceivedCounter += nBytes;
+                    getWindow().getDecorView().post(() -> vTxtNumSoundBytesReceived.setText(""+soundBytesReceivedCounter));
+                }
+
+                @Override
+                public void onBytesPlayed(int nBytes) {
+                    soundBytesPlayedCounter += nBytes;
+                    getWindow().getDecorView().post(() -> vTxtNumSoundBytesPlayed.setText(""+soundBytesPlayedCounter));
+                }
+            });
+            mPlayer.setOnConnectionStatusListener(new OnConnectionStatusListener() {
+                @Override
+                public void onConnectionRestorted(int nTry) {
+                    updateSoundConnectionState(true, nTry, 0);
+                    soundBytesReceivedCounter = 0;
+                    soundBytesPlayedCounter = 0;
+                    getWindow().getDecorView().post(() -> {
+                        vTxtNumSoundBytesReceived.setText("");
+                        vTxtNumSoundBytesPlayed.setText("");
+                    });
+                }
+
+                @Override
+                public void onConnectionAttemptFailed(int nTry) {
+                    updateSoundConnectionState(false, -1, nTry);
+                }
+
+                @Override
+                public void onConnectionBroken(String nameThreadCauseFailure, Throwable reason) {
+                    updateSoundConnectionState(false, -1, -1);
+                }
+            });
+
+            /*getWindow().getDecorView().postDelayed(() -> {
                 deviceReceiverSound = new BtSoundReceiverImpl(device, GlobalConstants.UUID_SERVICE_2, (data, offset, nBytes) -> {
                     soundBytesCounter += nBytes;
-                    getWindow().getDecorView().post(() -> vTxtNumSoundBytes.setText(""+soundBytesCounter));
+                    getWindow().getDecorView().post(() -> vTxtNumSoundBytesReceived.setText(""+soundBytesCounter));
                 });
-                deviceReceiverSound.setOnTransceiverStatusListener(new OnTransceiverStatusListener() {
+                deviceReceiverSound.setOnTransceiverStatusListener(new OnConnectionStatusListener() {
                     @Override
                     public void onConnectionRestorted(int nTry) {
                         updateSoundConnectionState(true, nTry);
                         soundBytesCounter = 0;
-                        getWindow().getDecorView().post(() -> vTxtNumSoundBytes.setText(""));
+                        getWindow().getDecorView().post(() -> vTxtNumSoundBytesReceived.setText(""));
                     }
 
                     @Override
@@ -112,12 +175,13 @@ public class MainActivity extends BaseActivity {
                         updateSoundConnectionState(false, -1);
                     }
                 });
-            }, 1500);
+            }, 1500);*/
 
 
         } catch (BluetoothNotSupportedException e) {
-            if (deviceTransceiverCommand != null) deviceTransceiverCommand.release();
-            if (deviceReceiverSound != null) deviceReceiverSound.release();
+            if(deviceTransceiverCommand != null) deviceTransceiverCommand.release();
+            //if (deviceReceiverSound != null) deviceReceiverSound.release();
+            if(mPlayer != null) mPlayer.release();
             Toast.makeText(this, "BluetoothNotSupportedException", Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -127,9 +191,11 @@ public class MainActivity extends BaseActivity {
         vCommandConnStatus = findViewById(R.id.command_conn_status);
         vTxtCommandConnTry = (TextView) findViewById(R.id.command_conn_try);
 
-        vTxtNumSoundBytes = (TextView) findViewById(R.id.sound_num_bytes);
+        vTxtNumSoundBytesReceived = (TextView) findViewById(R.id.sound_num_bytes_received);
+        vTxtNumSoundBytesPlayed = (TextView)  findViewById(R.id.sound_num_bytes_played);
         vSoundConnStatus = findViewById(R.id.sound_conn_status);
-        vTxtSoundConnTry = (TextView) findViewById(R.id.sound_conn_try);
+        vTxtSoundNumReconnect = (TextView) findViewById(R.id.sound_num_reconnects);
+        vTxtSoundNumTryes = (TextView) findViewById(R.id.sound_failed_tries);
 
 
         ((TextView) findViewById(R.id.device_given_name)).setText(mDevice.userDefinedName());
@@ -143,15 +209,49 @@ public class MainActivity extends BaseActivity {
         findViewById(R.id.btn_command_status).setOnClickListener(v -> sendSingleCommand("status"));
 
         findViewById(R.id.btn_command_record).setOnClickListener(v -> sendSingleCommand("record"));
-        findViewById(R.id.btn_command_stop).setOnClickListener(v -> sendSingleCommand("stop"));
-        findViewById(R.id.btn_command_play).setOnClickListener(v -> sendSingleCommand("play"));
+        vBtnStop = (ToggleButton) findViewById(R.id.btn_command_stop);
+        vBtnPlay = (ToggleButton) findViewById(R.id.btn_command_play);
+
+        vBtnPlay.setOnClickListener(v -> {
+            sendSingleCommand("play");
+            if (!userRequestedPlay) {
+                userRequestedPlay = true;
+                mPlayer.play();
+            }
+            updatePlayStopButtonsState();
+        });
+
+        vBtnStop.setOnClickListener(v -> {
+            sendSingleCommand("stop");
+            if (userRequestedPlay) {
+                userRequestedPlay = false;
+                mPlayer.pause();
+            }
+            updatePlayStopButtonsState();
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (userRequestedPlay) {
+            mPlayer.play();
+        }
+        updatePlayStopButtonsState();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mPlayer.pause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (deviceTransceiverCommand != null) deviceTransceiverCommand.release();
-        if (deviceReceiverSound != null) deviceReceiverSound.release();
+        if(deviceTransceiverCommand != null) deviceTransceiverCommand.release();
+        //if (deviceReceiverSound != null) deviceReceiverSound.release();
+        if(mPlayer != null) mPlayer.release();
     }
 
     private ValidBtDevice getDeviceArgument() {
@@ -168,6 +268,12 @@ public class MainActivity extends BaseActivity {
     }
 
 
+    private void updatePlayStopButtonsState() {
+        vBtnStop.setChecked(!userRequestedPlay);
+        vBtnPlay.setChecked(userRequestedPlay);
+    }
+
+
 
     private void sendCommandSetTime(Date d) {
         try {
@@ -179,6 +285,15 @@ public class MainActivity extends BaseActivity {
             String command = jTime.toString();
 
             deviceTransceiverCommand.sendDataNonBlocked(command);
+
+
+            AudioTrack audioTrack = null;
+            audioTrack.play();
+            audioTrack.pause();
+            audioTrack.stop();
+            audioTrack.release();
+            audioTrack.write(new byte[5], 0, 0);
+
 
             logDataSentToUi(command);
         } catch (JSONException ignore) {}
@@ -223,12 +338,15 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private void updateSoundConnectionState(final boolean connected, final int nConnTry) {
+    private void updateSoundConnectionState(final boolean connected, final int nReconnects, final int nFailedTries) {
         getWindow().getDecorView().post(new Runnable() {
             @Override
             public void run() {
-                if (nConnTry >= 0) {
-                    vTxtSoundConnTry.setText(""+nConnTry);
+                if (nReconnects >= 0) {
+                    vTxtSoundNumReconnect.setText(""+nReconnects);
+                }
+                if (nFailedTries >= 0) {
+                    vTxtSoundNumTryes.setText(""+nFailedTries);
                 }
                 vSoundConnStatus.getBackground().setLevel(connected ? 1 : 0);
             }

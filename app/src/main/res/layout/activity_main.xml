@@ -176,7 +176,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:background="@drawable/bg_blinker"/>
-                    <TextView android:id="@+id/sound_conn_try"
+                    <TextView android:id="@+id/sound_num_reconnects"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
@@ -193,18 +193,52 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:layout_marginTop="6dp" >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="8dp"
+                        android:text="Conn failed tries:"/>
+                    <TextView android:id="@+id/sound_failed_tries"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:text="-"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="6dp" >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="8dp"
+                        android:text="Received bytes:"/>
+                    <TextView android:id="@+id/sound_num_bytes_received"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:text="0"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:layout_marginTop="6dp"
                     android:layout_marginBottom="4dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="8dp"
-                        android:text="Got bytes:"/>
-                    <TextView android:id="@+id/sound_num_bytes"
+                        android:text="Played bytes:"/>
+                    <TextView android:id="@+id/sound_num_bytes_played"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
-                        android:text="4584"/>
+                        android:text="0"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -264,17 +298,21 @@
                 android:layout_weight="1"
                 android:text="Rec"/>
 
-            <Button android:id="@+id/btn_command_stop"
+            <ToggleButton android:id="@+id/btn_command_stop"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Stop"/>
+                android:text="Stop"
+                android:textOn="Stop"
+                android:textOff="Stop"/>
 
-            <Button android:id="@+id/btn_command_play"
+            <ToggleButton android:id="@+id/btn_command_play"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Play"/>
+                android:text="Play"
+                android:textOn="Play"
+                android:textOff="Play"/>
 
         </LinearLayout>
 
