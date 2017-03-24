@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- disabled state -->
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/btn_corner_radius"/>
+            <solid android:color="@color/btn_disabled_fill"/>
+            <stroke android:width="@dimen/btn_stroke_width" android:color="@color/btn_disabled_stroke" />
+        </shape>
+    </item>
+
+    <!-- Enabled. Pressed+unlocked -->
+    <item app:state_locked="false" android:state_pressed="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_corner_radius"/>
+                    <solid android:color="@color/btn_regular_enabled_fill"/>
+                    <stroke android:width="@dimen/btn_stroke_width" android:color="@color/btn_regular_enabled_stroke" />
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_corner_radius"/>
+                    <solid android:color="@color/btn_pressed_overlay"/>
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- Enabled. Unpressed or Pressed+Locked -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/btn_corner_radius"/>
+            <solid android:color="@color/btn_regular_enabled_fill"/>
+            <stroke android:width="@dimen/btn_stroke_width" android:color="@color/btn_regular_enabled_stroke" />
+        </shape>
+    </item>
+
+</selector>

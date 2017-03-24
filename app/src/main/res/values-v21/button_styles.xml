@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="att_color_btn_disabled_fill" format="color"/>
+    <attr name="att_color_btn_disabled_stroke" format="color"/>
+    <attr name="att_color_btn_regular_enabled_fill" format="color"/>
+    <attr name="att_color_btn_regular_enabled_stroke" format="color"/>
+
+    <attr name="att_color_btn_enabled_on_fill" format="color"/>
+    <attr name="att_color_btn_enabled_on_stroke" format="color"/>
+    <attr name="att_color_btn_enabled_off_fill" format="color"/>
+    <attr name="att_color_btn_enabled_off_stroke" format="color"/>
+
+
+    <style name="ButtonLockable">
+        <item name="drawable_lock">@drawable/btn_lock_selector</item>
+        <item name="drawable_lock_margin">@dimen/btn_lock_indicator_margin</item>
+
+    </style>
+
+    <style name="ButtonLockable.Regular">
+        <item name="android:textColor">@color/reg_button_text_color_selector</item>
+        <item name="android:background">@drawable/bg_btn_regular_v21</item>
+    </style>
+
+
+    <style name="ButtonLockable.Togglable">
+        <item name="android:textColor">@color/toggle_button_text_color_selector</item>
+        <item name="android:background">@drawable/bg_btn_togglable_v21</item>
+    </style>
+
+
+
+
+    <style name="ThemeButton">
+        <item name="att_color_btn_disabled_fill">@color/btn_disabled_fill</item>
+        <item name="att_color_btn_disabled_stroke">@color/btn_disabled_stroke</item>
+
+    </style>
+
+    <style name="ThemeButton.RegularGray">
+        <item name="att_color_btn_regular_enabled_fill">@color/btn_regular_enabled_fill</item>
+        <item name="att_color_btn_regular_enabled_stroke">@color/btn_regular_enabled_stroke</item>
+    </style>
+
+    <style name="ThemeButton.TogglableRed">
+        <item name="att_color_btn_enabled_on_fill">@color/btn_red_on_fill</item>
+        <item name="att_color_btn_enabled_on_stroke">@color/btn_red_on_stroke</item>
+        <item name="att_color_btn_enabled_off_fill">@color/btn_red_off_fill</item>
+        <item name="att_color_btn_enabled_off_stroke">@color/btn_red_off_stroke</item>
+    </style>
+
+    <style name="ThemeButton.TogglableGreen">
+        <item name="att_color_btn_enabled_on_fill">@color/btn_green_on_fill</item>
+        <item name="att_color_btn_enabled_on_stroke">@color/btn_green_on_stroke</item>
+        <item name="att_color_btn_enabled_off_fill">@color/btn_green_off_fill</item>
+        <item name="att_color_btn_enabled_off_stroke">@color/btn_green_off_stroke</item>
+    </style>
+
+    <style name="ThemeButton.TogglableOrange">
+        <item name="att_color_btn_enabled_on_fill">@color/btn_orange_on_fill</item>
+        <item name="att_color_btn_enabled_on_stroke">@color/btn_orange_on_stroke</item>
+        <item name="att_color_btn_enabled_off_fill">@color/btn_orange_off_fill</item>
+        <item name="att_color_btn_enabled_off_stroke">@color/btn_orange_off_stroke</item>
+    </style>
+
+
+
+</resources>

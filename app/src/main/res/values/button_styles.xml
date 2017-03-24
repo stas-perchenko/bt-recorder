@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <attr name="att_btn_background" format="reference"/>
+
+
+    <style name="ButtonLockable">
+        <item name="drawable_lock">@drawable/btn_lock_selector</item>
+        <item name="drawable_lock_margin">@dimen/btn_lock_indicator_margin</item>
+        <item name="android:background">?attr/att_btn_background</item>
+    </style>
+
+    <style name="ButtonLockable.Regular">
+        <item name="android:textColor">@color/reg_button_text_color_selector</item>
+    </style>
+
+    <style name="ButtonLockable.Togglable">
+        <item name="android:textColor">@color/toggle_button_text_color_selector</item>
+    </style>
+
+
+
+
+
+    <style name="ThemeButton">
+    </style>
+
+    <style name="ThemeButton.RegularGray">
+        <item name="att_btn_background">@drawable/bg_btn_regular_gray</item>
+    </style>
+
+    <style name="ThemeButton.TogglableRed">
+        <item name="att_btn_background">@drawable/bg_btn_toggle_red</item>
+    </style>
+
+    <style name="ThemeButton.TogglableGreen">
+        <item name="att_btn_background">@drawable/bg_btn_toggle_green</item>
+    </style>
+
+    <style name="ThemeButton.TogglableOrange">
+        <item name="att_btn_background">@drawable/bg_btn_toggle_orange</item>
+    </style>
+
+
+
+
+
+
+
+</resources>

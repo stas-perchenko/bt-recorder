@@ -4,4 +4,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="no_devices_placeholder_height">64dp</dimen>
+
+    <dimen name="btn_corner_radius">8dp</dimen>
+    <dimen name="btn_stroke_width">2dp</dimen>
+    <dimen name="btn_lock_indicator_margin">8dp</dimen>
 </resources>

@@ -10,4 +10,31 @@
     <color name="text_white">#FFFFFF</color>
     <color name="text_red">#B04081</color>
     <color name="bg_section_title">#3090A0</color>
+
+
+    <color name="toggle_btn_text_enabled_on">#FFFFFF</color>
+    <color name="toggle_btn_text_enabled_off">#222222</color>
+    <color name="toggle_btn_text_disabled">#B5B5B5</color>
+
+    <color name="btn_disabled_fill">#E5E5E5</color>
+    <color name="btn_disabled_stroke">#C5C5C5</color>
+
+    <color name="btn_regular_enabled_fill">#F3F3F3</color>
+    <color name="btn_regular_enabled_stroke">#656565</color>
+    <color name="btn_pressed_overlay">#35000000</color>
+
+    <color name="btn_green_on_fill">#1AF00E</color>
+    <color name="btn_green_on_stroke">#1AD111</color>
+    <color name="btn_green_off_fill">#7DB57D</color>
+    <color name="btn_green_off_stroke">#3D7A3A</color>
+
+    <color name="btn_red_on_fill">#FC0D0D</color>
+    <color name="btn_red_on_stroke">#C41010</color>
+    <color name="btn_red_off_fill">#B57D7D</color>
+    <color name="btn_red_off_stroke">#AD4E4E</color>
+
+    <color name="btn_orange_on_fill">#FFE20A</color>
+    <color name="btn_orange_on_stroke">#FADE0A</color>
+    <color name="btn_orange_off_fill">#E6DA81</color>
+    <color name="btn_orange_off_stroke">#BFAC17</color>
 </resources>

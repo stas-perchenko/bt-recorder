@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- This is the color value for ripple element -->
+    <color name="btn_pressed_overlay">#555555</color>
+
+</resources>

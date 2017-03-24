@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LockableToggleButton">
+        <attr name="state_locked" format="boolean" />
+        <attr name="drawable_lock" format="reference"/>
+        <attr name="drawable_lock_margin" format="dimension"/>
+    </declare-styleable>
+</resources>

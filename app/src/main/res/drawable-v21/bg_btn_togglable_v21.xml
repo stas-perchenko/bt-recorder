@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <!-- disabled state -->
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/btn_corner_radius"/>
+            <solid android:color="?attr/att_color_btn_disabled_fill"/>
+            <stroke android:width="@dimen/btn_stroke_width" android:color="?attr/att_color_btn_disabled_stroke" />
+        </shape>
+    </item>
+
+
+    <!-- Enabled. Locked + checked -->
+    <item app:state_locked="true" android:state_checked="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/btn_corner_radius"/>
+            <solid android:color="?attr/att_color_btn_enabled_on_fill"/>
+            <stroke android:width="@dimen/btn_stroke_width" android:color="?attr/att_color_btn_enabled_on_stroke" />
+        </shape>
+    </item>
+
+    <!-- Enabled. Locked + Unchecked -->
+    <item app:state_locked="true" android:state_checked="false">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/btn_corner_radius"/>
+            <solid android:color="?attr/att_color_btn_enabled_off_fill"/>
+            <stroke android:width="@dimen/btn_stroke_width" android:color="?attr/att_color_btn_enabled_off_stroke" />
+        </shape>
+    </item>
+
+
+    <item android:state_checked="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_corner_radius"/>
+                    <solid android:color="?attr/att_color_btn_enabled_on_fill"/>
+                    <stroke android:width="@dimen/btn_stroke_width" android:color="?attr/att_color_btn_enabled_on_stroke" />
+                </shape>
+            </item>
+
+            <item>
+                <ripple android:color="@color/btn_pressed_overlay">
+                    <item android:id="@android:id/mask">
+                        <shape android:shape="rectangle">
+                            <solid android:color="#000000"/>
+                            <corners android:radius="@dimen/btn_corner_radius"/>
+                        </shape>
+                    </item>
+                </ripple>
+            </item>
+        </layer-list>
+    </item>
+
+
+    <item >
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_corner_radius"/>
+                    <solid android:color="?attr/att_color_btn_enabled_off_fill"/>
+                    <stroke android:width="@dimen/btn_stroke_width" android:color="?attr/att_color_btn_enabled_off_stroke" />
+                </shape>
+            </item>
+
+            <item>
+                <ripple android:color="@color/btn_pressed_overlay">
+                    <item android:id="@android:id/mask">
+                        <shape android:shape="rectangle">
+                            <solid android:color="#000000"/>
+                            <corners android:radius="@dimen/btn_corner_radius"/>
+                        </shape>
+                    </item>
+                </ripple>
+            </item>
+        </layer-list>
+    </item>
+
+
+</selector>
