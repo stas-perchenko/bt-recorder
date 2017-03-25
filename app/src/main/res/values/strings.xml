@@ -35,6 +35,6 @@
 
     <string name="action_clear_db">Clear device cache</string>
 
-    <string name="section_title_rec_options">Recording Oprions</string>
+    <string name="section_title_rec_options">Recording Options</string>
 
 </resources>

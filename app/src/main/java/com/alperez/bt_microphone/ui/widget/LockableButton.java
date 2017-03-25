@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.widget.TextView;
 
 import com.alperez.bt_microphone.R;
@@ -50,6 +51,7 @@ public class LockableButton extends TextView {
             drawableLock = a.getDrawable(R.styleable.LockableToggleButton_drawable_lock);
             locked = a.getBoolean(R.styleable.LockableToggleButton_state_locked, locked);
             drLockMargin = a.getDimensionPixelSize(R.styleable.LockableToggleButton_drawable_lock_margin, 0);
+            setGravity(Gravity.CENTER);
         } finally {
             a.recycle();
         }
