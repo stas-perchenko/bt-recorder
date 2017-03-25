@@ -8,4 +8,6 @@
     <dimen name="btn_corner_radius">8dp</dimen>
     <dimen name="btn_stroke_width">2dp</dimen>
     <dimen name="btn_lock_indicator_margin">8dp</dimen>
+
+    <dimen name="row_height">48dp</dimen>
 </resources>

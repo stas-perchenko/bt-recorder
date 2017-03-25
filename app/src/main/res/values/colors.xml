@@ -37,4 +37,8 @@
     <color name="btn_orange_on_stroke">#FADE0A</color>
     <color name="btn_orange_off_fill">#E6DA81</color>
     <color name="btn_orange_off_stroke">#BFAC17</color>
+
+
+    <color name="section_title_text_color">#FFFFFF</color>
+    <color name="section_title_bg_color">@color/colorPrimary</color>
 </resources>

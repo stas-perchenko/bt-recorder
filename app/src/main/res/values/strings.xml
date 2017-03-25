@@ -13,6 +13,28 @@
     <string name="action_connect_last_device">Connect</string>
     <string name="action_check_known_devices">Check known devices</string>
     <string name="action_search_new_devices">Search new devices</string>
+    <string name="action_record">Record</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_lock">Lock</string>
+    <string name="action_unlock">Unlock</string>
+    <string name="action_rev">Reverse x1 to x16</string>
+    <string name="action_fvd">Forward x1 to x16</string>
+    <string name="action_gain_up">More Gain</string>
+    <string name="action_gain_down">Less Gain</string>
+    <string name="action_prev_index">Previous Index</string>
+    <string name="action_text_index">Next Index</string>
+    <string name="action_quality_24_48">24bit / 48kSps</string>
+    <string name="action_quality_24_96">24bit / 96kSps</string>
+    <string name="action_quality_24_192">24bit / 192kSps</string>
+    <string name="action_pahntom_on">Phantom On</string>
+    <string name="action_pahntom_off">Phantom Off</string>
+
+
 
     <string name="action_clear_db">Clear device cache</string>
+
+    <string name="section_title_rec_options">Recording Oprions</string>
+
 </resources>

@@ -9,7 +9,487 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Row 0 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/row_height"
+            android:layout_weight="0"
+            android:orientation="horizontal">
+
+            <!-- Row: 0, Column: 0, 1 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:background="#A5A5A5">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:text="Device status and sound level"/>
+
+            </FrameLayout>
+
+            <!-- Row: 0, Column: 2 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableToggleButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.TogglableRed"
+                    style="@style/ButtonLockable.Togglable"
+                    android:text="@string/action_record"/>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!--===================================== Row 1 =========================================-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/row_height"
+            android:layout_weight="0"
+            android:orientation="horizontal">
+
+            <!-- Row: 1, Column: 0 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.RegularGray"
+                    style="@style/ButtonLockable.Regular"
+                    android:text="@string/action_stop"/>
+
+            </FrameLayout>
+
+            <!-- Row: 1, Column: 1 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <com.alperez.bt_microphone.ui.widget.LockableToggleButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.TogglableGreen"
+                    style="@style/ButtonLockable.Togglable"
+                    android:textOff="@string/action_play"
+                    android:textOn="@string/action_pause" />
+
+            </FrameLayout>
+
+            <!-- Row: 0, Column: 2 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableToggleButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.TogglableOrange"
+                    style="@style/ButtonLockable.Togglable"
+                    android:textOff="@string/action_lock"
+                    android:textOn="@string/action_unlock" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!--===================================== Row 2 =========================================-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/row_height"
+            android:layout_weight="0"
+            android:orientation="horizontal">
+
+            <!-- Row: 2, Column: 0 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.RegularGray"
+                    style="@style/ButtonLockable.Regular"
+                    android:text="@string/action_rev"/>
+
+            </FrameLayout>
+
+            <!-- Row: 2, Column: 1 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.RegularGray"
+                    style="@style/ButtonLockable.Regular"
+                    android:text="@string/action_fvd"/>
+
+            </FrameLayout>
+
+            <!-- Row: 2, Column: 2 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.RegularGray"
+                    style="@style/ButtonLockable.Regular"
+                    android:text="@string/action_gain_up"/>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!--===================================== Row 3 =========================================-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/row_height"
+            android:layout_weight="0"
+            android:orientation="horizontal">
+
+            <!-- Row: 3, Column: 0 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.RegularGray"
+                    style="@style/ButtonLockable.Regular"
+                    android:text="@string/action_prev_index"/>
+
+            </FrameLayout>
+
+            <!-- Row: 3, Column: 1 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.RegularGray"
+                    style="@style/ButtonLockable.Regular"
+                    android:text="@string/action_text_index"/>
+
+            </FrameLayout>
+
+            <!-- Row: 3, Column: 2 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.RegularGray"
+                    style="@style/ButtonLockable.Regular"
+                    android:text="@string/action_gain_down"/>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:gravity="center_horizontal"
+            android:text="@string/section_title_rec_options"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/section_title_text_color"
+            android:background="@color/section_title_bg_color"/>
+
+        <!--===================================== Row 4 =========================================-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/row_height"
+            android:layout_weight="0"
+            android:orientation="horizontal" >
+
+            <!-- Row: 4, Column: 0 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableToggleButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.TogglableGreen"
+                    style="@style/ButtonLockable.Togglable"
+                    android:text="@string/action_quality_24_48"/>
+
+            </FrameLayout>
+
+            <!-- Row: 4, Column: 1 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableToggleButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.TogglableGreen"
+                    style="@style/ButtonLockable.Togglable"
+                    android:text="@string/action_quality_24_96"/>
+
+            </FrameLayout>
+
+            <!-- Row: 4, Column: 2 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableToggleButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.TogglableGreen"
+                    style="@style/ButtonLockable.Togglable"
+                    android:text="@string/action_quality_24_192"/>
+
+            </FrameLayout>
+
+            <!-- Row: 4, Column: 3 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableToggleButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.TogglableOrange"
+                    style="@style/ButtonLockable.Togglable"
+                    android:textOn="@string/action_unlock"
+                    android:textOff="@string/action_lock" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!--===================================== Row 5 =========================================-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/row_height"
+            android:layout_weight="0"
+            android:orientation="horizontal">
+
+            <!-- Row: 5, Column: 0 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text="Date"/>
+
+            </FrameLayout>
+
+            <!-- Row: 5, Column: 1 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text="Time"/>
+
+            </FrameLayout>
+
+            <!-- Row: 5, Column: 2 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text="GEO location"/>
+
+            </FrameLayout>
+
+            <!-- Row: 5, Column: 3 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+                <com.alperez.bt_microphone.ui.widget.LockableToggleButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:theme="@style/ThemeButton.TogglableGreen"
+                    style="@style/ButtonLockable.Togglable"
+                    android:textOff="@string/action_pahntom_on"
+                    android:textOn="@string/action_pahntom_off" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!--===================================== Row 6 =========================================-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:background="@color/colorPrimary">
+
+            <!-- Row: 5, Column: 0 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:text="Battery level info"/>
+
+            </FrameLayout>
+
+            <!-- Row: 5, Column: 1 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:text="Sound memory status"/>
+            </FrameLayout>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_settings_24px"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
