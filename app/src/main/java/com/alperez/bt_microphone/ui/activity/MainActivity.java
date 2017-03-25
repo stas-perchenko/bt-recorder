@@ -3,8 +3,12 @@ package com.alperez.bt_microphone.ui.activity;
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.AppCompatSpinner;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -153,10 +157,44 @@ public class MainActivity extends BaseActivity {
         findViewById(R.id.btn_command_set_time).setOnClickListener(v -> sendCommandSetTime(new Date()));
         findViewById(R.id.btn_command_status).setOnClickListener(v -> sendSingleCommand("status"));
 
-        findViewById(R.id.btn_command_record).setOnClickListener(v -> sendSingleCommand("record"));
-        findViewById(R.id.btn_command_stop).setOnClickListener(v -> sendSingleCommand("stop"));
-        findViewById(R.id.btn_command_play).setOnClickListener(v -> sendSingleCommand("play"));
+
+        Spinner commSpin = (Spinner) findViewById(R.id.command_spinner);
+        commSpin.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, new String[]{
+                "status",
+                "version",
+                "play",
+                "stop",
+                "record",
+                "current",
+                "previous",
+                "next",
+                "format",
+                "poweroff",
+                "gainup",
+                "gaindown",
+                "fforward",
+                "freverse",
+                "phanotmon",
+                "phantomoff"
+        }));
+
+        commSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+                currentSelectedCommand = (String)((ArrayAdapter) ((Spinner) parent).getAdapter()).getItem(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        findViewById(R.id.btn_command_send).setOnClickListener(v -> sendSingleCommand(currentSelectedCommand));
+
     }
+
+    private String currentSelectedCommand="";
 
     @Override
     protected void onDestroy() {

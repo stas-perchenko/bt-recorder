@@ -273,25 +273,22 @@
             android:orientation="horizontal"
             android:layout_marginTop="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp">
+            android:layout_marginRight="8dp"
+            android:gravity="center_vertical">
 
-            <Button android:id="@+id/btn_command_record"
-                android:layout_width="0dp"
+
+
+            <Button android:id="@+id/btn_command_send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="Send"/>
+
+            <Spinner android:id="@+id/command_spinner"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Rec"/>
-
-            <Button android:id="@+id/btn_command_stop"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Stop"/>
-
-            <Button android:id="@+id/btn_command_play"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Play"/>
+                android:gravity="center"/>
 
         </LinearLayout>
 
