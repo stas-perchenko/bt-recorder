@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.alperez.bt_microphone.model.BlacklistedBtDevice;
-import com.alperez.bt_microphone.model.ValidBtDevice;
+import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -80,9 +80,9 @@ public class DatabaseAdapter {
         }
     }
 
-    public ValidBtDevice selectValidDeviceById(long id) {
+    public ValidDeviceDbModel selectValidDeviceById(long id) {
         String where = String.format("%s = %d", BlacklistedBtDevice.COLUMN_ID, id);
-        Cursor c = db.query(ValidBtDevice.TABLE_NAME, null, where, null, null, null, null);
+        Cursor c = db.query(ValidDeviceDbModel.TABLE_NAME, null, where, null, null, null, null);
         try {
             if (c.moveToFirst()) {
                 return buildValidDeviceFromCursor(c);
@@ -94,10 +94,10 @@ public class DatabaseAdapter {
         }
     }
 
-    public List<ValidBtDevice> selectAllValidDevices() {
-        Cursor c = db.query(ValidBtDevice.TABLE_NAME, null, null, null, null, null, ValidBtDevice.COLUMN_TIME_LAST_CONNECTED);
+    public List<ValidDeviceDbModel> selectAllValidDevices() {
+        Cursor c = db.query(ValidDeviceDbModel.TABLE_NAME, null, null, null, null, null, ValidDeviceDbModel.COLUMN_TIME_LAST_CONNECTED);
         try {
-            List<ValidBtDevice> result = new ArrayList<>(5);
+            List<ValidDeviceDbModel> result = new ArrayList<>(5);
             if (c.moveToFirst()) {
                 do {
                     result.add(buildValidDeviceFromCursor(c));
@@ -109,17 +109,17 @@ public class DatabaseAdapter {
         }
     }
 
-    private ValidBtDevice buildValidDeviceFromCursor(Cursor c) {
-        return ValidBtDevice.builder()
-                .setMacAddress(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_MAC)))
-                .setDeviceName(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_ORIG_DEVICE_NAME)))
-                .setSerialNumber(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_SERIAL_NUM)))
-                .setHardwareVersion(c.getInt(c.getColumnIndex(ValidBtDevice.COLUMN_HARD_VERSION)))
-                .setFirmwareVersion(c.getInt(c.getColumnIndex(ValidBtDevice.COLUMN_SOFT_VERSION)))
-                .setReleaseDate(new Date(c.getLong(c.getColumnIndex(ValidBtDevice.COLUMN_RELEASE_DATE))))
-                .setUserDefinedName(c.getString(c.getColumnIndex(ValidBtDevice.COLUMN_USER_DEVINED_NAME)))
-                .setTimeDiscovered(new Date(c.getLong(c.getColumnIndex(ValidBtDevice.COLUMN_TIME_DISCOVERED))))
-                .setTimeLastConnected(new Date(c.getLong(c.getColumnIndex(ValidBtDevice.COLUMN_TIME_LAST_CONNECTED))))
+    private ValidDeviceDbModel buildValidDeviceFromCursor(Cursor c) {
+        return ValidDeviceDbModel.builder()
+                .setMacAddress(c.getString(c.getColumnIndex(ValidDeviceDbModel.COLUMN_MAC)))
+                .setDeviceName(c.getString(c.getColumnIndex(ValidDeviceDbModel.COLUMN_ORIG_DEVICE_NAME)))
+                .setSerialNumber(c.getString(c.getColumnIndex(ValidDeviceDbModel.COLUMN_SERIAL_NUM)))
+                .setHardwareVersion(c.getInt(c.getColumnIndex(ValidDeviceDbModel.COLUMN_HARD_VERSION)))
+                .setFirmwareVersion(c.getInt(c.getColumnIndex(ValidDeviceDbModel.COLUMN_SOFT_VERSION)))
+                .setReleaseDate(new Date(c.getLong(c.getColumnIndex(ValidDeviceDbModel.COLUMN_RELEASE_DATE))))
+                .setUserDefinedName(c.getString(c.getColumnIndex(ValidDeviceDbModel.COLUMN_USER_DEVINED_NAME)))
+                .setTimeDiscovered(new Date(c.getLong(c.getColumnIndex(ValidDeviceDbModel.COLUMN_TIME_DISCOVERED))))
+                .setTimeLastConnected(new Date(c.getLong(c.getColumnIndex(ValidDeviceDbModel.COLUMN_TIME_LAST_CONNECTED))))
                 .build();
     }
 
@@ -136,34 +136,34 @@ public class DatabaseAdapter {
     }
 
 
-    public long insertValidDevice(ValidBtDevice device) {
+    public long insertValidDevice(ValidDeviceDbModel device) {
         ContentValues vals = new ContentValues();
-        vals.put(ValidBtDevice.COLUMN_ID, device.id());
-        vals.put(ValidBtDevice.COLUMN_MAC, device.macAddress());
-        vals.put(ValidBtDevice.COLUMN_ORIG_DEVICE_NAME, device.deviceName());
-        vals.put(ValidBtDevice.COLUMN_SERIAL_NUM, device.serialNumber());
-        vals.put(ValidBtDevice.COLUMN_HARD_VERSION, device.hardwareVersion());
-        vals.put(ValidBtDevice.COLUMN_SOFT_VERSION, device.firmwareVersion());
-        vals.put(ValidBtDevice.COLUMN_RELEASE_DATE, device.releaseDate().getTime());
-        vals.put(ValidBtDevice.COLUMN_USER_DEVINED_NAME, device.userDefinedName());
-        vals.put(ValidBtDevice.COLUMN_TIME_DISCOVERED, device.timeDiscovered().getTime());
+        vals.put(ValidDeviceDbModel.COLUMN_ID, device.id());
+        vals.put(ValidDeviceDbModel.COLUMN_MAC, device.macAddress());
+        vals.put(ValidDeviceDbModel.COLUMN_ORIG_DEVICE_NAME, device.deviceName());
+        vals.put(ValidDeviceDbModel.COLUMN_SERIAL_NUM, device.serialNumber());
+        vals.put(ValidDeviceDbModel.COLUMN_HARD_VERSION, device.hardwareVersion());
+        vals.put(ValidDeviceDbModel.COLUMN_SOFT_VERSION, device.firmwareVersion());
+        vals.put(ValidDeviceDbModel.COLUMN_RELEASE_DATE, device.releaseDate().getTime());
+        vals.put(ValidDeviceDbModel.COLUMN_USER_DEVINED_NAME, device.userDefinedName());
+        vals.put(ValidDeviceDbModel.COLUMN_TIME_DISCOVERED, device.timeDiscovered().getTime());
         if (device.timeLastConnected() != null) {
-            vals.put(ValidBtDevice.COLUMN_TIME_LAST_CONNECTED, device.timeLastConnected().getTime());
+            vals.put(ValidDeviceDbModel.COLUMN_TIME_LAST_CONNECTED, device.timeLastConnected().getTime());
         }
 
-        return db.insert(ValidBtDevice.TABLE_NAME, null, vals);
+        return db.insert(ValidDeviceDbModel.TABLE_NAME, null, vals);
     }
 
-    public boolean updateValidDeviceTimeLastConnected(ValidBtDevice device) {
-        String where = String.format("%s = %d", ValidBtDevice.COLUMN_ID, device.id());
+    public boolean updateValidDeviceTimeLastConnected(ValidDeviceDbModel device) {
+        String where = String.format("%s = %d", ValidDeviceDbModel.COLUMN_ID, device.id());
         ContentValues vals = new ContentValues();
-        vals.put(ValidBtDevice.COLUMN_TIME_LAST_CONNECTED, device.timeLastConnected().getTime());
-        return (db.update(ValidBtDevice.TABLE_NAME, vals, where, null) > 0);
+        vals.put(ValidDeviceDbModel.COLUMN_TIME_LAST_CONNECTED, device.timeLastConnected().getTime());
+        return (db.update(ValidDeviceDbModel.TABLE_NAME, vals, where, null) > 0);
     }
 
 
     public int clearValidDevices() {
-        return db.delete(ValidBtDevice.TABLE_NAME, null, null);
+        return db.delete(ValidDeviceDbModel.TABLE_NAME, null, null);
     }
 
     public int clearBlacklistedDevices() {

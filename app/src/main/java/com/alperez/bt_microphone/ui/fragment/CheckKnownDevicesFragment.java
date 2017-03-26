@@ -2,7 +2,7 @@ package com.alperez.bt_microphone.ui.fragment;
 
 import android.support.v4.app.Fragment;
 
-import com.alperez.bt_microphone.model.ValidBtDevice;
+import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class CheckKnownDevicesFragment extends Fragment {
 
-    public void setDevices(List<ValidBtDevice> devices) {
+    public void setDevices(List<ValidDeviceDbModel> devices) {
         //TODO Implemtnt this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 

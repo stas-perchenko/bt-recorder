@@ -1,20 +1,15 @@
 package com.alperez.bt_microphone.bluetoorh.management;
 
-import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.alperez.bt_microphone.GlobalConstants;
-import com.alperez.bt_microphone.bluetoorh.BtUtils;
 import com.alperez.bt_microphone.model.DiscoveredBluetoothDevice;
-import com.alperez.bt_microphone.model.ValidBtDevice;
+import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.utils.Callback;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Date;
 
 /**
@@ -27,7 +22,7 @@ public class DiscoveredDeviceVerifier {
 
 
     private final DiscoveredBluetoothDevice device;
-    private Callback<ValidBtDevice> resultCallback;
+    private Callback<ValidDeviceDbModel> resultCallback;
     private OnStageListener testListener;
 
 
@@ -54,7 +49,7 @@ public class DiscoveredDeviceVerifier {
             @Override
             public void run() {
                 try {
-                    ValidBtDevice result = doTheJobBackground();
+                    ValidDeviceDbModel result = doTheJobBackground();
                     resultHandler.obtainMessage(0, result).sendToTarget();
                 } catch (InterruptedException e) {
                     Log.e(TAG, "Verifier thread was interrupted - "+e.getMessage());
@@ -68,7 +63,7 @@ public class DiscoveredDeviceVerifier {
         };
     }
 
-    public DiscoveredDeviceVerifier withResultCallback(Callback<ValidBtDevice> callback) {
+    public DiscoveredDeviceVerifier withResultCallback(Callback<ValidDeviceDbModel> callback) {
         resultCallback = callback;
         return this;
     }
@@ -86,7 +81,7 @@ public class DiscoveredDeviceVerifier {
 
 
 
-    private ValidBtDevice doTheJobBackground() throws Exception {
+    private ValidDeviceDbModel doTheJobBackground() throws Exception {
         //--- Initial delay ---
         Thread.sleep(3500);
 /*
@@ -140,7 +135,7 @@ public class DiscoveredDeviceVerifier {
         resultHandler.obtainMessage(MSG_STAGE_3_COMPLETE).sendToTarget();
 
 */
-        return ValidBtDevice.builder()
+        return ValidDeviceDbModel.builder()
                 .setMacAddress(device.getDevice().getAddress())
                 .setDeviceName(device.getDevice().getName())
                 .setSerialNumber("sdgjdf-kgjbdfg-dflg")
@@ -185,8 +180,8 @@ public class DiscoveredDeviceVerifier {
                     break;
                 default:
                     if (resultCallback != null) {
-                        if (msg.obj instanceof ValidBtDevice) {
-                            resultCallback.onComplete((ValidBtDevice) msg.obj);
+                        if (msg.obj instanceof ValidDeviceDbModel) {
+                            resultCallback.onComplete((ValidDeviceDbModel) msg.obj);
                         } else if (msg.obj instanceof Throwable) {
                             resultCallback.onError((Throwable) msg.obj);
                         }

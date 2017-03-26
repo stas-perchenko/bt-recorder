@@ -22,7 +22,7 @@ import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiverImpl;
 import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundPlayer;
 import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundPlayerImpl;
 import com.alperez.bt_microphone.bluetoorh.connector.sound.OnPlayerPerformanceListener;
-import com.alperez.bt_microphone.model.ValidBtDevice;
+import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
 import com.alperez.bt_microphone.ui.Layout;
 import com.alperez.bt_microphone.ui.adapter.DataTransferArrayAdapter;
@@ -42,7 +42,7 @@ public class MainActivity extends BaseActivity {
     public static final String ARG_VALID_DEVICE_ID = "device_id";
 
 
-    private ValidBtDevice mDevice;
+    private ValidDeviceDbModel mDevice;
 
     private DataTransferArrayAdapter logAdapter;
 
@@ -254,7 +254,7 @@ public class MainActivity extends BaseActivity {
         if(mPlayer != null) mPlayer.release();
     }
 
-    private ValidBtDevice getDeviceArgument() {
+    private ValidDeviceDbModel getDeviceArgument() {
         long id = getIntent().getLongExtra(ARG_VALID_DEVICE_ID, -1);
         if (id <= 0) {
             return null;

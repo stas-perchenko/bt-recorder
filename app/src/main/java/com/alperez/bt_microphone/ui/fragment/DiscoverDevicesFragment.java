@@ -20,7 +20,7 @@ import com.alperez.bt_microphone.databinding.FragmentDevicesDiscoveryBinding;
 import com.alperez.bt_microphone.databinding.GeneralDeviceListItemBinding;
 import com.alperez.bt_microphone.model.BlacklistedBtDevice;
 import com.alperez.bt_microphone.model.DiscoveredBluetoothDevice;
-import com.alperez.bt_microphone.model.ValidBtDevice;
+import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.ui.viewmodel.BtDeviceViewModel;
 
 /**
@@ -35,7 +35,7 @@ public class DiscoverDevicesFragment extends Fragment {
 
     public interface OnDeviceSelectionResultListener {
         void onNewDeviceSelected(DiscoveredBluetoothDevice device);
-        void onKnowDeviceSelected(ValidBtDevice device);
+        void onKnowDeviceSelected(ValidDeviceDbModel device);
     }
 
 
@@ -71,7 +71,7 @@ public class DiscoverDevicesFragment extends Fragment {
                 }
 
                 @Override
-                public void onValidDeviceFound(ValidBtDevice device) {
+                public void onValidDeviceFound(ValidDeviceDbModel device) {
                     addDeviceToUi(device, vBinding.containerKnownDevices, vBinding.noItemsKnownDevices).setOnClickListener(clickerKnownDevices);
                 }
 
@@ -166,8 +166,8 @@ public class DiscoverDevicesFragment extends Fragment {
 
     private View.OnClickListener clickerKnownDevices = (v) -> {
         Object tag = v.getTag();
-        if ((tag != null) && (tag instanceof ValidBtDevice)) {
-            resultListener.onKnowDeviceSelected((ValidBtDevice) tag);
+        if ((tag != null) && (tag instanceof ValidDeviceDbModel)) {
+            resultListener.onKnowDeviceSelected((ValidDeviceDbModel) tag);
         }
     };
 }

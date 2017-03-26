@@ -19,7 +19,7 @@ import com.alperez.bt_microphone.bluetoorh.management.DeviceFounder;
 import com.alperez.bt_microphone.bluetoorh.management.OnDeviceFoundListener;
 import com.alperez.bt_microphone.model.BlacklistedBtDevice;
 import com.alperez.bt_microphone.model.DiscoveredBluetoothDevice;
-import com.alperez.bt_microphone.model.ValidBtDevice;
+import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
 
 import java.util.Date;
@@ -222,7 +222,7 @@ public class DeviceFounderImpl implements DeviceFounder {
             return;
         }
 
-        ValidBtDevice validDev = dbAdapter.selectValidDeviceById(deviceId);
+        ValidDeviceDbModel validDev = dbAdapter.selectValidDeviceById(deviceId);
         if (validDev != null) {
             Log.e(TAG, "This device is already known");
             resultHandlerToUi.sendMessage(resultHandlerToUi.obtainMessage(0, validDev));
@@ -431,8 +431,8 @@ public class DeviceFounderImpl implements DeviceFounder {
         @Override
         public void handleMessage(Message msg) {
             if (resultHandlerToUi != null) {
-                if ((msg.obj != null) && (msg.obj instanceof ValidBtDevice)) {
-                    devFoundListener.onValidDeviceFound((ValidBtDevice) msg.obj);
+                if ((msg.obj != null) && (msg.obj instanceof ValidDeviceDbModel)) {
+                    devFoundListener.onValidDeviceFound((ValidDeviceDbModel) msg.obj);
                 } else if ((msg.obj != null) && (msg.obj instanceof BlacklistedBtDevice)) {
                     devFoundListener.onBlacklistedDeviceFound((BlacklistedBtDevice) msg.obj);
                 } else if ((msg.obj != null) && (msg.obj instanceof DiscoveredBluetoothDevice)) {

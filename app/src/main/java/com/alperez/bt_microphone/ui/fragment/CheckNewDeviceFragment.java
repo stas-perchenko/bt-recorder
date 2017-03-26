@@ -15,12 +15,10 @@ import com.alperez.bt_microphone.R;
 import com.alperez.bt_microphone.bluetoorh.management.DiscoveredDeviceVerifier;
 import com.alperez.bt_microphone.databinding.FragmentCheckNewDeviceBinding;
 import com.alperez.bt_microphone.model.DiscoveredBluetoothDevice;
-import com.alperez.bt_microphone.model.ValidBtDevice;
+import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
 import com.alperez.bt_microphone.ui.IFullScreenProgress;
 import com.alperez.bt_microphone.utils.Callback;
-
-import junit.framework.TestListener;
 
 import java.util.Date;
 
@@ -31,7 +29,7 @@ import java.util.Date;
 public class CheckNewDeviceFragment extends Fragment {
 
     public interface OnDeviceFerifiedListener {
-        void onDeveiceVerified(ValidBtDevice device);
+        void onDeveiceVerified(ValidDeviceDbModel device);
         void onErrorVerification(DiscoveredBluetoothDevice device, Throwable error);
     }
 
@@ -53,7 +51,7 @@ public class CheckNewDeviceFragment extends Fragment {
 
 
     private FragmentCheckNewDeviceBinding vBinding;
-    private ValidBtDevice resultDevice;
+    private ValidDeviceDbModel resultDevice;
 
 
 
@@ -172,9 +170,9 @@ public class CheckNewDeviceFragment extends Fragment {
                 vBinding.progressStage3.setVisibility(View.INVISIBLE);
                 vBinding.checkStage3.getBackground().setLevel(1);
             }
-        }).withResultCallback(new Callback<ValidBtDevice>() {
+        }).withResultCallback(new Callback<ValidDeviceDbModel>() {
             @Override
-            public void onComplete(ValidBtDevice result) {
+            public void onComplete(ValidDeviceDbModel result) {
                 controller = null;
                 //fullScreenProgress.dismissFullScreenProgress();
                 populateValidDevice(result);
@@ -189,7 +187,7 @@ public class CheckNewDeviceFragment extends Fragment {
         });
     }
 
-    private void populateValidDevice(ValidBtDevice result) {
+    private void populateValidDevice(ValidDeviceDbModel result) {
         resultDevice = result;
         if (vBinding != null) {
             vBinding.setDevice(result);
@@ -208,13 +206,13 @@ public class CheckNewDeviceFragment extends Fragment {
         if (TextUtils.isEmpty(name)) {
             Toast.makeText(getActivity(), "Please, name the device!", Toast.LENGTH_SHORT).show();
         } else {
-            ValidBtDevice finalDevice = saveNamedDevice(vBinding.getDevice().withUserDefinedName(name));
+            ValidDeviceDbModel finalDevice = saveNamedDevice(vBinding.getDevice().withUserDefinedName(name));
             resultListener.onDeveiceVerified(finalDevice);
         }
     }
 
-    private ValidBtDevice saveNamedDevice(ValidBtDevice namedDevice) {
-        ValidBtDevice timedDev = namedDevice.withTimeDiscovered(new Date());
+    private ValidDeviceDbModel saveNamedDevice(ValidDeviceDbModel namedDevice) {
+        ValidDeviceDbModel timedDev = namedDevice.withTimeDiscovered(new Date());
         DatabaseAdapter db = new DatabaseAdapter();
         try {
             db.insertValidDevice(timedDev);

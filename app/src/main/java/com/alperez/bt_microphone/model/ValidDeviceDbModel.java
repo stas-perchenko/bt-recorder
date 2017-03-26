@@ -13,7 +13,7 @@ import java.util.Date;
  * Created by stanislav.perchenko on 3/9/2017.
  */
 @AutoValue
-public abstract class ValidBtDevice extends BaseDbModel implements BtDeviceViewModel, Parcelable, Cloneable {
+public abstract class ValidDeviceDbModel extends BaseDbModel implements BtDeviceViewModel, Parcelable, Cloneable {
     public static final String TABLE_NAME = "valid_devices";
 
     public static final String COLUMN_ID = "id";
@@ -52,29 +52,29 @@ public abstract class ValidBtDevice extends BaseDbModel implements BtDeviceViewM
     }
 
     public static Builder builder() {
-        return new AutoValue_ValidBtDevice.Builder();
+        return new AutoValue_ValidDeviceDbModel.Builder();
     }
 
 
     public abstract Builder toBuilder();
 
-    public ValidBtDevice withUserDefinedName(@Nullable String userDefinedName) {
+    public ValidDeviceDbModel withUserDefinedName(@Nullable String userDefinedName) {
         return toBuilder().setUserDefinedName(userDefinedName).build();
     }
 
-    public ValidBtDevice withTimeDiscovered(Date timeDiscovered) {
+    public ValidDeviceDbModel withTimeDiscovered(Date timeDiscovered) {
         return toBuilder().setTimeDiscovered(timeDiscovered).build();
     }
 
-    public ValidBtDevice withBluetoothDevice(@Nullable BluetoothDevice device) {
+    public ValidDeviceDbModel withBluetoothDevice(@Nullable BluetoothDevice device) {
         return toBuilder().setBluetoothDevice(device).build();
     }
 
-    public ValidBtDevice withTimeLastConnected(Date timeLastConnected) {
+    public ValidDeviceDbModel withTimeLastConnected(Date timeLastConnected) {
         return toBuilder().setTimeLastConnected(new Date(timeLastConnected.getTime())).build();
     }
 
-    public ValidBtDevice clone() {
+    public ValidDeviceDbModel clone() {
         return builder()
                 .setMacAddress(macAddress())
                 .setDeviceName(deviceName())
@@ -103,7 +103,7 @@ public abstract class ValidBtDevice extends BaseDbModel implements BtDeviceViewM
 
         public abstract Builder setBluetoothDevice(BluetoothDevice bluetoothDevice);
 
-        public abstract ValidBtDevice build();
+        public abstract ValidDeviceDbModel build();
     }
 
 

@@ -15,10 +15,9 @@ import android.view.View;
 import com.alperez.bt_microphone.R;
 import com.alperez.bt_microphone.bluetoorh.BluetoothNotSupportedException;
 import com.alperez.bt_microphone.bluetoorh.BtUtils;
-import com.alperez.bt_microphone.bluetoorh.management.DeviceFounder;
 import com.alperez.bt_microphone.bluetoorh.management.impl.DeviceFounderImpl;
 import com.alperez.bt_microphone.model.DiscoveredBluetoothDevice;
-import com.alperez.bt_microphone.model.ValidBtDevice;
+import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
 import com.alperez.bt_microphone.ui.Layout;
 import com.alperez.bt_microphone.ui.fragment.CheckKnownDevicesFragment;
@@ -34,7 +33,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
 
 
     BluetoothAdapter btAdapter;
-    private List<ValidBtDevice> savedDevices;
+    private List<ValidDeviceDbModel> savedDevices;
 
 
     private Map<String, Fragment> allFragments = new HashMap<>();
@@ -64,7 +63,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
 
     }
 
-    private void goToMainActivity(ValidBtDevice dev) {
+    private void goToMainActivity(ValidDeviceDbModel dev) {
         Intent intent = new Intent(this, FinalActivity.class);
         intent.putExtra(MainActivity.ARG_VALID_DEVICE_ID, dev.id());
         startActivity(intent);
@@ -154,7 +153,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
     }
 
     @Override
-    public void onKnowDeviceSelected(ValidBtDevice device) {
+    public void onKnowDeviceSelected(ValidDeviceDbModel device) {
         goToMainActivity(device);
     }
 
@@ -164,7 +163,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
 
     /**********************  Interfaces for Check device Fragment  ********************************/
     @Override
-    public void onDeveiceVerified(ValidBtDevice device) {
+    public void onDeveiceVerified(ValidDeviceDbModel device) {
         goToMainActivity(device);
     }
 
@@ -192,7 +191,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
         findViewById(R.id.txt_no_saved_devices).setVisibility(visible ? View.GONE : View.VISIBLE);
     }
 
-    private List<ValidBtDevice> selectSavedDevices() {
+    private List<ValidDeviceDbModel> selectSavedDevices() {
         DatabaseAdapter db = new DatabaseAdapter();
         try {
             return db.selectAllValidDevices();

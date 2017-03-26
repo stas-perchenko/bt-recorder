@@ -11,7 +11,7 @@
 
         <variable
             name="device"
-            type="com.alperez.bt_microphone.model.ValidBtDevice"/>
+            type="com.alperez.bt_microphone.model.ValidDeviceDbModel"/>
 
         <variable
             name="uuid"
