@@ -7,7 +7,12 @@ import com.alperez.bt_microphone.bluetoorh.connector.OnConnectionStatusListener;
  */
 
 public interface BtDataTransceiver {
-    void setOnTransceiverStatusListener(OnConnectionStatusListener l);
+    BtDataTransceiver addOnTextDataReceivedListener(OnTextDataReceivedListener l);
+    boolean removeOnTextDataReceivedListener(OnTextDataReceivedListener l);
+
+    BtDataTransceiver addOnTransceiverStatusListener(OnConnectionStatusListener l);
+    boolean removeOnTransceiverStatusListener(OnConnectionStatusListener l);
+
     void sendDataNonBlocked(String data);
     void release();
 }

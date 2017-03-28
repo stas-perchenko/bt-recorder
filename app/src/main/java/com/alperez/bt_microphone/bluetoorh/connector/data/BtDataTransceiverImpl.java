@@ -13,8 +13,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -53,22 +56,20 @@ public class BtDataTransceiverImpl implements BtDataTransceiver {
 
     //----  Receiver-related section  ----
     private final ReceivingThread rcvThread;
-    private final OnTextDataReceivedListener rcvListener;
+
+    private final Set<OnTextDataReceivedListener> rcvListeners = Collections.synchronizedSet(new HashSet<>());
 
 
     //----  Transceiver status notification section ---
-    private final Object statusListenerLock = new Object();
-    private OnConnectionStatusListener statusListener;
+    private final Set<OnConnectionStatusListener> statusListeners = Collections.synchronizedSet(new HashSet<>());
 
     /**********************************  Public API section  **************************************/
 
-    public BtDataTransceiverImpl(@NonNull BluetoothDevice device, @NonNull UUID serviceUUID, @NonNull OnTextDataReceivedListener rcvListener) {
+    public BtDataTransceiverImpl(@NonNull BluetoothDevice device, @NonNull UUID serviceUUID) {
         if (device == null) throw new IllegalArgumentException("BluetoothDevice cannot be null");
         if (serviceUUID == null) throw new IllegalArgumentException("Service UUID cannot be null");
-        if (rcvListener == null) throw new IllegalArgumentException("Listener cannot be null");
         this.device = device;
         this.serviceUUID = serviceUUID;
-        this.rcvListener = rcvListener;
 
         ThreadLog.d(TAG, "=====  Transceiver created  =======");
 
@@ -81,10 +82,25 @@ public class BtDataTransceiverImpl implements BtDataTransceiver {
     }
 
     @Override
-    public void setOnTransceiverStatusListener(OnConnectionStatusListener l) {
-        synchronized (statusListenerLock) {
-            statusListener = l;
-        }
+    public BtDataTransceiver addOnTextDataReceivedListener(@NonNull OnTextDataReceivedListener l) {
+        this.rcvListeners.add(l);
+        return this;
+    }
+
+    @Override
+    public boolean removeOnTextDataReceivedListener(@NonNull OnTextDataReceivedListener l) {
+        return rcvListeners.remove(l);
+    }
+
+    @Override
+    public BtDataTransceiver addOnTransceiverStatusListener(@NonNull OnConnectionStatusListener l) {
+        statusListeners.add(l);
+        return this;
+    }
+
+    @Override
+    public boolean removeOnTransceiverStatusListener(@NonNull OnConnectionStatusListener l) {
+        return statusListeners.remove(l);
     }
 
     /**
@@ -146,9 +162,9 @@ public class BtDataTransceiverImpl implements BtDataTransceiver {
                                 @Override
                                 public void onConnectionFailure(Throwable reason) {
                                     //---  Notify status listener  ---
-                                    synchronized (statusListenerLock) {
-                                        if (statusListener != null) {
-                                            statusListener.onConnectionAttemptFailed(numConnectionTry);
+                                    synchronized (statusListeners) {
+                                        for (OnConnectionStatusListener sl : statusListeners) {
+                                            sl.onConnectionAttemptFailed(numConnectionTry);
                                         }
                                     }
 
@@ -178,9 +194,9 @@ public class BtDataTransceiverImpl implements BtDataTransceiver {
 
 
                     //---  Notify status listener  ---
-                    synchronized (statusListenerLock) {
-                        if (statusListener != null) {
-                            statusListener.onConnectionRestorted(numConnectionTry);
+                    synchronized (statusListeners) {
+                        for (OnConnectionStatusListener sl : statusListeners) {
+                            sl.onConnectionRestorted(numConnectionTry);
                         }
                     }
 
@@ -229,9 +245,9 @@ public class BtDataTransceiverImpl implements BtDataTransceiver {
 
         closeConnectionSilently();
 
-        synchronized (statusListenerLock) {
-            if (statusListener != null) {
-                statusListener.onConnectionBroken(failedThreadName, failureReason);
+        synchronized (statusListeners) {
+            for (OnConnectionStatusListener sl : statusListeners) {
+                sl.onConnectionBroken(failedThreadName, failureReason);
             }
         }
 
@@ -396,7 +412,11 @@ public class BtDataTransceiverImpl implements BtDataTransceiver {
                                 byte[] data = bos.toByteArray();
                                 String textData = new String(data, 0, data.length-2);
                                 bos.reset();
-                                rcvListener.onReceive(textData);
+                                synchronized (rcvListeners) {
+                                    for (OnTextDataReceivedListener rsl : rcvListeners) {
+                                        rsl.onReceive(textData);
+                                    }
+                                }
                             }
                         }
                         if (!released) {

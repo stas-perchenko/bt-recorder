@@ -19,6 +19,7 @@ import com.alperez.bt_microphone.bluetoorh.BtUtils;
 import com.alperez.bt_microphone.bluetoorh.connector.OnConnectionStatusListener;
 import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiver;
 import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiverImpl;
+import com.alperez.bt_microphone.bluetoorh.connector.data.OnTextDataReceivedListener;
 import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundPlayer;
 import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundPlayerImpl;
 import com.alperez.bt_microphone.bluetoorh.connector.sound.OnPlayerPerformanceListener;
@@ -96,8 +97,14 @@ public class MainActivity extends BaseActivity {
         try {
             BluetoothDevice device = BtUtils.getBtAdapter(this).getRemoteDevice(mDevice.macAddress());
             mDevice.withBluetoothDevice(device);
-            deviceTransceiverCommand = new BtDataTransceiverImpl(device, GlobalConstants.UUID_SERVICE_1, data -> getWindow().getDecorView().post(() -> logAdapter.add(DataTransferViewModel.createReceivedItem(new Date(), data))));
-            deviceTransceiverCommand.setOnTransceiverStatusListener(new OnConnectionStatusListener() {
+            deviceTransceiverCommand = new BtDataTransceiverImpl(device, GlobalConstants.UUID_SERVICE_1);
+            deviceTransceiverCommand.addOnTextDataReceivedListener(new OnTextDataReceivedListener() {
+                @Override
+                public void onReceive(String data) {
+                    getWindow().getDecorView().post(() -> logAdapter.add(DataTransferViewModel.createReceivedItem(new Date(), data)));
+                }
+            });
+            deviceTransceiverCommand.addOnTransceiverStatusListener(new OnConnectionStatusListener() {
                 @Override
                 public void onConnectionRestorted(int nTry) {
                     updateCommandConnectionState(true, nTry);
