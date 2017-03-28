@@ -1,8 +1,8 @@
-package com.alperez.bt_microphone.core.response;
+package com.alperez.bt_microphone.rest.response;
 
 import android.location.Location;
 
-import com.alperez.bt_microphone.core.DeviceFile;
+import com.alperez.bt_microphone.rest.response.commonmodels.DeviceFile;
 import com.alperez.bt_microphone.rest.RestUtils;
 
 import org.json.JSONException;

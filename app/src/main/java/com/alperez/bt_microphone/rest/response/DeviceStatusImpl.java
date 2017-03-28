@@ -1,7 +1,7 @@
-package com.alperez.bt_microphone.core.response;
+package com.alperez.bt_microphone.rest.response;
 
 import com.alperez.bt_microphone.core.DeviceState;
-import com.alperez.bt_microphone.core.DeviceStatus;
+import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
 
 import org.json.JSONException;
 import org.json.JSONObject;

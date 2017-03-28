@@ -1,4 +1,4 @@
-package com.alperez.bt_microphone.core;
+package com.alperez.bt_microphone.rest.response.commonmodels;
 
 import android.location.Location;
 
