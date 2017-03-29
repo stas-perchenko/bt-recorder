@@ -32,7 +32,7 @@ public abstract class BaseRestCommand {
                 .addOnTextDataReceivedListener(rcvListener);
     }
 
-    public void release() {
+    public final void release() {
         dataTransceiver.removeOnTextDataReceivedListener(rcvListener);
         dataTransceiver.removeOnTransceiverStatusListener(connStatusListener);
     }
@@ -53,6 +53,7 @@ public abstract class BaseRestCommand {
         JSONObject jBody = new JSONObject();
         try {
             jBody.put("id", seqNumber);
+            jBody.put("command", getCommandName());
             fillInRequestBody(jBody);
         } catch (JSONException e) {
             throw new IOException("Error build request body", e);
@@ -89,7 +90,12 @@ public abstract class BaseRestCommand {
      */
     protected abstract void fillInRequestBody(JSONObject jBody) throws JSONException;
 
-
+    /**
+     * This method must be implemented by subclasses. It returns a value of the "command" field
+     * of the request JSON
+     * @return
+     */
+    public abstract String getCommandName();
 
 
 
