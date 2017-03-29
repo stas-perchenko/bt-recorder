@@ -28,4 +28,3 @@ public class FormatRestCommand extends BaseRestCommand {
         //No options
     }
 }
-}

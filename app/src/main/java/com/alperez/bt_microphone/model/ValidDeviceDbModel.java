@@ -4,6 +4,9 @@ import android.bluetooth.BluetoothDevice;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import com.alperez.bt_microphone.GlobalConstants;
+import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiver;
+import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiverImpl;
 import com.alperez.bt_microphone.ui.viewmodel.BtDeviceViewModel;
 import com.google.auto.value.AutoValue;
 
@@ -67,7 +70,9 @@ public abstract class ValidDeviceDbModel extends BaseDbModel implements BtDevice
     }
 
     public ValidDeviceDbModel withBluetoothDevice(@Nullable BluetoothDevice device) {
-        return toBuilder().setBluetoothDevice(device).build();
+        ValidDeviceDbModel newModel = toBuilder().setBluetoothDevice(device).build();
+        newModel.dataTransceiver = null;
+        return newModel;
     }
 
     public ValidDeviceDbModel withTimeLastConnected(Date timeLastConnected) {
@@ -143,4 +148,22 @@ public abstract class ValidDeviceDbModel extends BaseDbModel implements BtDevice
     public BluetoothDevice getDevice() {
         return bluetoothDevice();
     }
+
+
+    private BtDataTransceiver dataTransceiver;
+
+    public synchronized BtDataTransceiver getDataTransceiver() {
+        if (dataTransceiver == null) {
+            dataTransceiver = new BtDataTransceiverImpl(bluetoothDevice(), GlobalConstants.UUID_SERVICE_1);
+        }
+        return dataTransceiver;
+    }
+
+    public synchronized void releaseDataTransceiver() {
+        if (dataTransceiver != null) {
+            dataTransceiver.release();
+            dataTransceiver = null;
+        }
+    }
+
 }

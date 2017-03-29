@@ -6,6 +6,7 @@ import android.os.Looper;
 
 import com.alperez.bt_microphone.GlobalConstants;
 import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiver;
+import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.rest.OnCompleteListener;
 import com.alperez.bt_microphone.rest.command.BaseRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.CurrFileRestCommand;
@@ -50,7 +51,7 @@ import java.util.concurrent.Executors;
 
 public class RemoteDevice {
 
-    private BtDataTransceiver dataTransceiver;
+    private ValidDeviceDbModel mDevice;
     private int commandTimeout;
 
     private volatile boolean released;
@@ -60,9 +61,11 @@ public class RemoteDevice {
 
     private OnCommandResultListener resultListener;
 
-    public RemoteDevice(int commandTimeout, @NonNull OnCommandResultListener resultListener) {
+    public RemoteDevice(ValidDeviceDbModel device, int commandTimeout, @NonNull OnCommandResultListener resultListener) {
+        this.mDevice = device;
         this.commandTimeout = commandTimeout;
         this.resultListener = resultListener;
+
         commandExecutor = Executors.newSingleThreadExecutor();
         commandStatus();
         commandVersion();
@@ -77,7 +80,7 @@ public class RemoteDevice {
             ((ExecutorService) commandExecutor).shutdownNow();
         }
         mCommandPool.releaseAllCommands();
-        //TODO Release device connection
+        mDevice.releaseDataTransceiver();
     }
 
 
@@ -212,7 +215,7 @@ public class RemoteDevice {
         public BaseRestCommand getCommand(String className) throws Exception {
             BaseRestCommand comm = commandMap.get(className);
             if (comm == null) {
-                comm = ((Class<BaseRestCommand>) Class.forName(className)).getConstructor(BtDataTransceiver.class).newInstance(dataTransceiver);
+                comm = ((Class<BaseRestCommand>) Class.forName(className)).getConstructor(BtDataTransceiver.class).newInstance(mDevice.getDataTransceiver());
                 commandMap.put(className, comm);
             }
             return comm;
@@ -267,7 +270,7 @@ public class RemoteDevice {
 
             if (callback == null) {
                 if (!resp.success() && resp instanceof ErrorResponse) {
-                    uiHandler.post(() -> resultListener.onDeviceResponseError(((ErrorResponse) resp).error()));
+                    uiHandler.post(() -> resultListener.onDeviceResponseError(command.getClass(), ((ErrorResponse) resp).error()));
                 } else if (resp.success() && resp instanceof SimpleSuccessResponse) {
                     uiHandler.post(() -> resultListener.onSipleCommandComplete(command.getCommandName()));
                 } else if (resp.success() && resp instanceof FileSuccessResponse) {
@@ -289,7 +292,7 @@ public class RemoteDevice {
                 uiHandler.post(() -> {
                     resultListener.onStatusUpdate(currentDeviceStatus);
                     resultListener.onNewFile(currentDeviceFile);
-                    resultListener.onCommunicationError(e.getMessage());
+                    resultListener.onCommunicationError(command.getClass(), e.getMessage());
                 });
             } else {
                 uiHandler.post(() -> callback.onError(  e.getMessage() ));
@@ -307,8 +310,8 @@ public class RemoteDevice {
         void onStatusUpdate(DeviceStatus devStatus);
         void onNewFile(DeviceFile devFile);
         void onSipleCommandComplete(String commandName);
-        void onDeviceResponseError(String reason);
-        void onCommunicationError(String error);
+        void onDeviceResponseError(Class<? extends BaseRestCommand> commandClass, String reason);
+        void onCommunicationError(Class<? extends BaseRestCommand> commandClass, String error);
     }
 
 }
