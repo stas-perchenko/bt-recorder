@@ -1,6 +1,7 @@
 package com.alperez.bt_microphone.rest.response;
 
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceFile;
+import com.alperez.bt_microphone.rest.response.commonmodels.DevicePosition;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
 
 import org.json.JSONException;
@@ -28,6 +29,7 @@ public class ResponseParser {
 
         private DeviceStatus devStatus;
         private DeviceFile devFile;
+        private DevicePosition devPosition;
 
 
         private Builder(JSONObject jResp) throws JSONException {
@@ -41,6 +43,22 @@ public class ResponseParser {
             JSONObject jFile = jResp.optJSONObject("file");
             if (jFile != null) {
                 devFile = DeviceFileImpl.fromJson(jFile);
+            }
+
+            if (jResp.has("duration") && jResp.has("position")) {
+                final int position = jResp.getInt("position");
+                final int duration = jResp.getInt("duration");
+                devPosition = new DevicePosition() {
+                    @Override
+                    public int duration() {
+                        return duration;
+                    }
+
+                    @Override
+                    public int position() {
+                        return position;
+                    }
+                };
             }
         }
 
@@ -112,6 +130,23 @@ public class ResponseParser {
                         }
                     };
 
+                } else if (devPosition != null) {
+                    return new PositionSuccessResponse() {
+                        @Override
+                        public DevicePosition getCurrentposition() {
+                            return devPosition;
+                        }
+
+                        @Override
+                        public int sequenceNumber() {
+                            return id;
+                        }
+
+                        @Override
+                        public boolean success() {
+                            return true;
+                        }
+                    };
                 } else {
                     return new SimpleSuccessResponse() {
                         @Override

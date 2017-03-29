@@ -28,7 +28,7 @@ class DeviceStatusImpl implements DeviceStatus {
         model.batteryLevel = jStatus.getInt("battery");
         model.phantomPowerOn = jStatus.getBoolean("phantom");
         try {
-            model.deviceState = DeviceState.valueOf(jStatus.getString("state"));
+            model.deviceState = parseDeviceState(jStatus.getString("state"));
         } catch (IllegalArgumentException e) {
             String err = String.format("Wrong DeviceState enum value %s. Supported values - %s", jStatus.getString("state"), Arrays.toString(DeviceState.values()));
             throw new JSONException(err);
@@ -38,6 +38,21 @@ class DeviceStatusImpl implements DeviceStatus {
 
         return model;
     }
+
+    private static DeviceState parseDeviceState(String state) throws JSONException {
+        if ("stopped".equals(state)) {
+            return DeviceState.STOPPED;
+        } else if ("paused".equals(state)) {
+            return DeviceState.PAUSED;
+        } else if ("recording".equals(state)) {
+            return DeviceState.RECORDING;
+        } else if ("playing".equals(state)) {
+            return DeviceState.PLAYING;
+        } else {
+            throw new JSONException("Wrong state value - "+state);
+        }
+    }
+
 
     private DeviceStatusImpl(){}
 

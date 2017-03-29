@@ -31,9 +31,11 @@ import com.alperez.bt_microphone.rest.command.impl.VersionRestCommand;
 import com.alperez.bt_microphone.rest.response.BaseResponse;
 import com.alperez.bt_microphone.rest.response.ErrorResponse;
 import com.alperez.bt_microphone.rest.response.FileSuccessResponse;
+import com.alperez.bt_microphone.rest.response.PositionSuccessResponse;
 import com.alperez.bt_microphone.rest.response.SimpleSuccessResponse;
 import com.alperez.bt_microphone.rest.response.StatusSuccessResponse;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceFile;
+import com.alperez.bt_microphone.rest.response.commonmodels.DevicePosition;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
 import com.android.annotations.NonNull;
 
@@ -277,6 +279,8 @@ public class RemoteDevice {
                     uiHandler.post(() -> resultListener.onNewFile(currentDeviceFile = ((FileSuccessResponse) resp).getCurrentlySetFile()));
                 } else if (resp.success() && resp instanceof StatusSuccessResponse) {
                     uiHandler.post(() -> resultListener.onStatusUpdate(currentDeviceStatus = ((StatusSuccessResponse) resp).getDeviceStatus()));
+                } else if (resp.success() && resp instanceof PositionSuccessResponse) {
+                    uiHandler.post(() -> resultListener.onPositionUpdate(  ((PositionSuccessResponse) resp).getCurrentposition() ));
                 }
             } else {
                 if (!resp.success() && resp instanceof ErrorResponse) {
@@ -309,6 +313,7 @@ public class RemoteDevice {
     public interface OnCommandResultListener {
         void onStatusUpdate(DeviceStatus devStatus);
         void onNewFile(DeviceFile devFile);
+        void onPositionUpdate(DevicePosition position);
         void onSipleCommandComplete(String commandName);
         void onDeviceResponseError(Class<? extends BaseRestCommand> commandClass, String reason);
         void onCommunicationError(Class<? extends BaseRestCommand> commandClass, String error);

@@ -49,7 +49,7 @@
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
                 android:paddingLeft="6dp"
-                android:paddingRight="6dp">
+                android:paddingRight="6dp" >
 
                 <com.alperez.bt_microphone.ui.widget.LockableToggleButton
                     android:layout_width="match_parent"
