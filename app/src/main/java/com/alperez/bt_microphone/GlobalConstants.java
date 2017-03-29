@@ -23,4 +23,6 @@ public class GlobalConstants {
 
     public static final int MAX_TIME_FOR_SDP = 10000;
     public static final int MAX_TIME_AFTER_LAST_UUID_DISCOVERED = 4000;
+
+    public static final int FORMAT_COMMAND_TIMEOUT = 8000;
 }

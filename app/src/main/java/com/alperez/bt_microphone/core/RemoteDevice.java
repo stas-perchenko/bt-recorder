@@ -4,13 +4,28 @@ import android.location.Location;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.alperez.bt_microphone.GlobalConstants;
 import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiver;
+import com.alperez.bt_microphone.rest.OnCompleteListener;
 import com.alperez.bt_microphone.rest.command.BaseRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.CurrFileRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.FastForwardRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.FastReverseRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.FormatRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.GainDownRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.GainUpRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.NextFileRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.PauseRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.PhantomOffRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.PhantomOnRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.PlayRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.PowerOffRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.PrevFileRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.RecordRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.SetSampleRateRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.SetTimeRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.StatusRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.StopRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.VersionRestCommand;
 import com.alperez.bt_microphone.rest.response.BaseResponse;
 import com.alperez.bt_microphone.rest.response.ErrorResponse;
@@ -103,8 +118,13 @@ public class RemoteDevice {
         scheduleNoParamCommand(NextFileRestCommand.class);
     }
 
-    public void commandFormat() {
-        khfsdif;
+    public void commandFormat(@NonNull OnCompleteListener callback) {
+        try {
+            BaseRestCommand comm = mCommandPool.getCommand(FormatRestCommand.class.getName());
+            commandExecutor.execute(new CommandHandlerWithCallback(comm, callback, GlobalConstants.FORMAT_COMMAND_TIMEOUT));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void commandPowerOff() {
@@ -112,15 +132,27 @@ public class RemoteDevice {
     }
 
     public void commandSetTime(Date time) {
-        fgdg;
+        try {
+            SetTimeRestCommand comm = (SetTimeRestCommand) mCommandPool.getCommand(SetTimeRestCommand.class.getName());
+            comm.setTime(time);
+            commandExecutor.execute(new CommandHandler(comm, commandTimeout));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void commandSetLocation(Location location) {
-        sdfdg;
+        //TODO Implement later !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     public void commandSetSampleRate(int sampleRate) {
-        fgfdg;
+        try {
+            SetSampleRateRestCommand comm = (SetSampleRateRestCommand) mCommandPool.getCommand(SetSampleRateRestCommand.class.getName());
+            comm.setSampleRate(sampleRate);
+            commandExecutor.execute(new CommandHandler(comm, commandTimeout));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void commandGainUp() {
@@ -132,11 +164,23 @@ public class RemoteDevice {
     }
 
     public void commandFastForward(int nSeconds) {
-
+        try {
+            FastForwardRestCommand comm = (FastForwardRestCommand) mCommandPool.getCommand(FastForwardRestCommand.class.getName());
+            comm.setSeconds(nSeconds);
+            commandExecutor.execute(new CommandHandler(comm, commandTimeout));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void commandFastReverse(int nSeconds) {
-        fgfdg;
+        try {
+            FastReverseRestCommand comm = (FastReverseRestCommand) mCommandPool.getCommand(FastReverseRestCommand.class.getName());
+            comm.setSeconds(nSeconds);
+            commandExecutor.execute(new CommandHandler(comm, commandTimeout));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void commandPhantomOn() {
@@ -194,31 +238,62 @@ public class RemoteDevice {
 
         @Override
         public void run() {
-            onExecuteCommandSynchronously(command, timeoutMillis);
+            onExecuteCommandSynchronously(command, null, timeoutMillis);
+        }
+    }
+
+    private class CommandHandlerWithCallback implements Runnable {
+        private final BaseRestCommand command;
+        private OnCompleteListener callback;
+        private final int timeoutMillis;
+
+        public CommandHandlerWithCallback(BaseRestCommand command, OnCompleteListener callback, int timeoutMillis) {
+            this.command = command;
+            this.callback = callback;
+            this.timeoutMillis = timeoutMillis;
+        }
+
+
+        @Override
+        public void run() {
+            onExecuteCommandSynchronously(command, callback, timeoutMillis);
         }
     }
 
 
-    private void onExecuteCommandSynchronously(BaseRestCommand command, int timeoutMillis) {
+    private void onExecuteCommandSynchronously(BaseRestCommand command, OnCompleteListener callback, int timeoutMillis) {
         try {
             BaseResponse resp = command.sendBlocked(timeoutMillis);
-            if (!resp.success() && resp instanceof ErrorResponse) {
-                uiHandler.post(() -> resultListener.onDeviceResponseError(  ((ErrorResponse) resp).error()  ));
-            } else if (resp.success() && resp instanceof SimpleSuccessResponse) {
-                uiHandler.post(() -> resultListener.onSipleCommandComplete(  command.getCommandName()  ));
-            } else if (resp.success() && resp instanceof FileSuccessResponse) {
-                uiHandler.post(() -> resultListener.onNewFile(  currentDeviceFile = ((FileSuccessResponse) resp).getCurrentlySetFile()  ));
-            } else if (resp.success() && resp instanceof StatusSuccessResponse) {
-                uiHandler.post(() -> resultListener.onStatusUpdate( currentDeviceStatus = ((StatusSuccessResponse) resp).getDeviceStatus()  ));
+
+            if (callback == null) {
+                if (!resp.success() && resp instanceof ErrorResponse) {
+                    uiHandler.post(() -> resultListener.onDeviceResponseError(((ErrorResponse) resp).error()));
+                } else if (resp.success() && resp instanceof SimpleSuccessResponse) {
+                    uiHandler.post(() -> resultListener.onSipleCommandComplete(command.getCommandName()));
+                } else if (resp.success() && resp instanceof FileSuccessResponse) {
+                    uiHandler.post(() -> resultListener.onNewFile(currentDeviceFile = ((FileSuccessResponse) resp).getCurrentlySetFile()));
+                } else if (resp.success() && resp instanceof StatusSuccessResponse) {
+                    uiHandler.post(() -> resultListener.onStatusUpdate(currentDeviceStatus = ((StatusSuccessResponse) resp).getDeviceStatus()));
+                }
+            } else {
+                if (!resp.success() && resp instanceof ErrorResponse) {
+                    uiHandler.post(() -> callback.onError(  ((ErrorResponse) resp).error() ));
+                } else {
+                    uiHandler.post(() -> callback.onComplete());
+                }
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-            uiHandler.post(() -> {
-                resultListener.onStatusUpdate(currentDeviceStatus);
-                resultListener.onNewFile(currentDeviceFile);
-                resultListener.onCommunicationError(e.getMessage());
-            });
+            if (callback == null) {
+                uiHandler.post(() -> {
+                    resultListener.onStatusUpdate(currentDeviceStatus);
+                    resultListener.onNewFile(currentDeviceFile);
+                    resultListener.onCommunicationError(e.getMessage());
+                });
+            } else {
+                uiHandler.post(() -> callback.onError(  e.getMessage() ));
+            }
         }
     }
 
