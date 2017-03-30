@@ -65,7 +65,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
 
     private void goToMainActivity(ValidDeviceDbModel dev) {
         Intent intent = new Intent(this, FinalActivity.class);
-        intent.putExtra(MainActivity.ARG_VALID_DEVICE_ID, dev.id());
+        intent.putExtra(FinalActivity.ARG_VALID_DEVICE_ID, dev.id());
         startActivity(intent);
         finish();
     }

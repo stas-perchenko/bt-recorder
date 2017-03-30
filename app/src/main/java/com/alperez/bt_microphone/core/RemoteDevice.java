@@ -72,7 +72,6 @@ public class RemoteDevice {
         commandStatus();
         commandVersion();
         commandCurrentFile();
-
     }
 
 
@@ -274,7 +273,7 @@ public class RemoteDevice {
                 if (!resp.success() && resp instanceof ErrorResponse) {
                     uiHandler.post(() -> resultListener.onDeviceResponseError(command.getClass(), ((ErrorResponse) resp).error()));
                 } else if (resp.success() && resp instanceof SimpleSuccessResponse) {
-                    uiHandler.post(() -> resultListener.onSipleCommandComplete(command.getCommandName()));
+                    uiHandler.post(() -> resultListener.onSimpleCommandComplete(command.getCommandName()));
                 } else if (resp.success() && resp instanceof FileSuccessResponse) {
                     uiHandler.post(() -> resultListener.onNewFile(currentDeviceFile = ((FileSuccessResponse) resp).getCurrentlySetFile()));
                 } else if (resp.success() && resp instanceof StatusSuccessResponse) {
@@ -294,8 +293,8 @@ public class RemoteDevice {
             e.printStackTrace();
             if (callback == null) {
                 uiHandler.post(() -> {
-                    resultListener.onStatusUpdate(currentDeviceStatus);
-                    resultListener.onNewFile(currentDeviceFile);
+                    if (currentDeviceStatus != null) resultListener.onStatusUpdate(currentDeviceStatus);
+                    if (currentDeviceFile != null) resultListener.onNewFile(currentDeviceFile);
                     resultListener.onCommunicationError(command.getClass(), e.getMessage());
                 });
             } else {
@@ -314,7 +313,7 @@ public class RemoteDevice {
         void onStatusUpdate(DeviceStatus devStatus);
         void onNewFile(DeviceFile devFile);
         void onPositionUpdate(DevicePosition position);
-        void onSipleCommandComplete(String commandName);
+        void onSimpleCommandComplete(String commandName);
         void onDeviceResponseError(Class<? extends BaseRestCommand> commandClass, String reason);
         void onCommunicationError(Class<? extends BaseRestCommand> commandClass, String error);
     }

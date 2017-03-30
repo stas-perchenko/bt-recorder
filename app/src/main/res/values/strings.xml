@@ -24,7 +24,7 @@
     <string name="action_gain_up">More Gain</string>
     <string name="action_gain_down">Less Gain</string>
     <string name="action_prev_index">Previous Index</string>
-    <string name="action_text_index">Next Index</string>
+    <string name="action_next_index">Next Index</string>
     <string name="action_quality_24_48">24bit / 48kSps</string>
     <string name="action_quality_24_96">24bit / 96kSps</string>
     <string name="action_quality_24_192">24bit / 192kSps</string>

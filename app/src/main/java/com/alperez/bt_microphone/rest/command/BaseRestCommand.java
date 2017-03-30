@@ -71,7 +71,7 @@ public abstract class BaseRestCommand {
                 throw new IOException("Receiving was interrupted");
             }
             if (jResponse == null) {
-                throw new IOException("Response was not received in time");
+                throw new IOException("Timeout - response was not received in time!");
             }
             try {
                 return ResponseParser.parseResponse(jResponse);
