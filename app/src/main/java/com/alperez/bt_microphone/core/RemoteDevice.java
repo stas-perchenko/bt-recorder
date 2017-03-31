@@ -3,6 +3,7 @@ package com.alperez.bt_microphone.core;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.alperez.bt_microphone.GlobalConstants;
 import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiver;
@@ -52,6 +53,7 @@ import java.util.concurrent.Executors;
  */
 
 public class RemoteDevice {
+    public static final String TAG = "Remote-Device";
 
     private ValidDeviceDbModel mDevice;
     private int commandTimeout;
@@ -69,9 +71,9 @@ public class RemoteDevice {
         this.resultListener = resultListener;
 
         commandExecutor = Executors.newSingleThreadExecutor();
-        commandStatus();
+        /*commandStatus();
         commandVersion();
-        commandCurrentFile();
+        commandCurrentFile();*/
     }
 
 
@@ -267,7 +269,10 @@ public class RemoteDevice {
 
     private void onExecuteCommandSynchronously(BaseRestCommand command, OnCompleteListener callback, int timeoutMillis) {
         try {
+            Log.d(TAG, "====> Send command: "+command.getCommandName());
             BaseResponse resp = command.sendBlocked(timeoutMillis);
+
+            Log.i(TAG, "----> Command response: ");
 
             if (callback == null) {
                 if (!resp.success() && resp instanceof ErrorResponse) {
@@ -290,6 +295,7 @@ public class RemoteDevice {
             }
 
         } catch (IOException e) {
+            Log.e(TAG, "~~~~> Commend error - "+e.getMessage(), e);
             e.printStackTrace();
             if (callback == null) {
                 uiHandler.post(() -> {

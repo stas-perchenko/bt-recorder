@@ -1,10 +1,12 @@
 package com.alperez.bt_microphone.rest.command;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.alperez.bt_microphone.bluetoorh.connector.OnConnectionStatusListener;
 import com.alperez.bt_microphone.bluetoorh.connector.data.BtDataTransceiver;
 import com.alperez.bt_microphone.bluetoorh.connector.data.OnTextDataReceivedListener;
+import com.alperez.bt_microphone.rest.RestUtils;
 import com.alperez.bt_microphone.rest.response.BaseResponse;
 import com.alperez.bt_microphone.rest.response.ResponseParser;
 
@@ -19,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 public abstract class BaseRestCommand {
+    public static final String TAG = "rest-command";
 
     private BtDataTransceiver dataTransceiver;
 
@@ -60,7 +63,9 @@ public abstract class BaseRestCommand {
         }
 
         //----  send request async  ----
-        dataTransceiver.sendDataNonBlocked(jBody.toString());
+        String text = jBody.toString();
+        Log.i(TAG, "====> Send command - "+text);
+        dataTransceiver.sendDataNonBlocked(text);
 
         //----  Wait for the response with timeout  ----
         synchronized (zsgdunLock) {
@@ -68,15 +73,22 @@ public abstract class BaseRestCommand {
                 zsgdunLock.wait(timeoutMillis);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                Log.e(TAG, "!!!!!!!  Waiting thread was interrupted !!!!!!!");
                 throw new IOException("Receiving was interrupted");
             }
             if (jResponse == null) {
+                Log.e(TAG, "~~~~>  Command answer receive timeout!");
                 throw new IOException("Timeout - response was not received in time!");
             }
             try {
+                Log.i(TAG, "----> Answer - "+jResponse.toString());
                 return ResponseParser.parseResponse(jResponse);
             } catch (JSONException e) {
+                Log.e(TAG, "~~~~>  Command answer parse error - "+e.getMessage(), e);
+                e.printStackTrace();
                 throw new IOException("Error parse response", e);
+            } finally {
+                jResponse = null;
             }
         }
     }
@@ -103,9 +115,10 @@ public abstract class BaseRestCommand {
     private OnTextDataReceivedListener rcvListener = new OnTextDataReceivedListener() {
         @Override
         public void onReceive(String data) {
+            Log.d(TAG, "Raw data received - "+data);
             try {
                 JSONObject jrsp = new JSONObject(data);
-                int id = jrsp.getInt("id");
+                int id = RestUtils.parseIntOptString(jrsp, "id");
                 if (id == currentSequenceNumber.get()) {
                     synchronized (zsgdunLock) {
                         jResponse = jrsp;
@@ -115,6 +128,8 @@ public abstract class BaseRestCommand {
                     // This is not for me!
                 }
             } catch (JSONException ignore) {
+                Log.e(TAG, "!!! Receiver thread. Imitial parsing answer error - "+ignore.getMessage(), ignore);
+                ignore.printStackTrace();
                 // Ignore this error.
                 // Timeout error may be fired in the waiting-for-response thread.
             }

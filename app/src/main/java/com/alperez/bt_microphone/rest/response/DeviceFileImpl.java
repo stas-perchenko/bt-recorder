@@ -31,10 +31,8 @@ class DeviceFileImpl implements DeviceFile {
             throw new JSONException("error parse date/time - "+dt);
         }
         model.durationMillis = jFile.getLong("dur");
-        model.sampleRate = jFile.getInt("freq");
-        model.geoLocation = new Location("GLONASS");
-        model.geoLocation.setLatitude(jFile.getDouble("lat"));
-        model.geoLocation.setLongitude(jFile.getDouble("lon"));
+        model.sampleRate = RestUtils.parseIntOptString(jFile, "freq");
+        model.geoLocation = RestUtils.parseLocationFromJson(jFile);
         return model;
     }
 

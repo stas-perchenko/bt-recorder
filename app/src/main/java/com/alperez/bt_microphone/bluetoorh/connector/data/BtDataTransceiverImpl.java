@@ -408,7 +408,7 @@ public class BtDataTransceiverImpl implements BtDataTransceiver {
                             b_2 = b_1;
                             b_1 = (byte)symb;
                             bos.write(symb);
-                            if ((b_2 == 0x0D && b_1 == 0x0A) || (b_2 == '/' && b_1 == 'n')) {
+                            if ((b_2 == 0x0D && b_1 == 0x0A)) {
                                 byte[] data = bos.toByteArray();
                                 String textData = new String(data, 0, data.length-2);
                                 bos.reset();

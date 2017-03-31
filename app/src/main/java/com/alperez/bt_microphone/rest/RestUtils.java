@@ -1,5 +1,10 @@
 package com.alperez.bt_microphone.rest;
 
+import android.location.Location;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,6 +14,46 @@ import java.util.Date;
  */
 
 public class RestUtils {
+
+
+    public static Location parseLocationFromJson(JSONObject json) {
+        String sLat = json.optString("lat", null);
+        String sLon = json.optString("lon", null);
+        if (sLat == null || sLon == null) return null;
+        Location loc = new Location("GLONASS");
+        loc.setLatitude(Double.parseDouble(sLat));
+        loc.setLongitude(Double.parseDouble(sLon));
+        return loc;
+    }
+
+    public static boolean parseBooleanOnOffFallback(JSONObject jObj, String fieldName) throws JSONException {
+        try {
+            return jObj.getBoolean(fieldName);
+        } catch (JSONException e) {
+            String sBool = jObj.optString(fieldName, "false");
+            if ("false".equalsIgnoreCase(sBool) || "off".equalsIgnoreCase(sBool)) {
+                return false;
+            } else if ("true".equalsIgnoreCase(sBool) || "on".equalsIgnoreCase(sBool)) {
+                return true;
+            } else {
+                throw new JSONException("Wrong boolean field value - "+sBool);
+            }
+        }
+    }
+
+    public static int parseIntOptString(JSONObject jObj, String fieldName) throws JSONException {
+        try {
+            return jObj.getInt(fieldName);
+        } catch (JSONException e) {
+            String sInt = jObj.optString(fieldName, "false");
+            try {
+                return Integer.parseInt(sInt);
+            } catch (Exception e1) {
+                throw new JSONException("Wrong integer field value - "+sInt);
+            }
+        }
+    }
+
 
     /*******************  Parsing/Formatting date-time for communication purposes  ****************/
     private static final String REST_DATE_TIME_FORMAT = "%1$tFT%1$tT.%1$tL";

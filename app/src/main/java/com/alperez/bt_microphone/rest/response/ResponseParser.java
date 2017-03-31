@@ -1,5 +1,6 @@
 package com.alperez.bt_microphone.rest.response;
 
+import com.alperez.bt_microphone.rest.RestUtils;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceFile;
 import com.alperez.bt_microphone.rest.response.commonmodels.DevicePosition;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
@@ -33,7 +34,7 @@ public class ResponseParser {
 
 
         private Builder(JSONObject jResp) throws JSONException {
-            id = jResp.getInt("id");
+            id = RestUtils.parseIntOptString(jResp, "id");
             success = checkSuccess(jResp);
             error = jResp.optString("error", null);
             JSONObject jStat = jResp.optJSONObject("status");
@@ -46,8 +47,8 @@ public class ResponseParser {
             }
 
             if (jResp.has("duration") && jResp.has("position")) {
-                final int position = jResp.getInt("position");
-                final int duration = jResp.getInt("duration");
+                final int position = RestUtils.parseIntOptString(jResp, "position");
+                final int duration = RestUtils.parseIntOptString(jResp, "duration");
                 devPosition = new DevicePosition() {
                     @Override
                     public int duration() {

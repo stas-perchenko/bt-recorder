@@ -78,6 +78,13 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
         }
     }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getWindow().getDecorView().postDelayed(() -> remDevice.commandStatus(), 500);
+    }
+
     private void onStopClicked() {
         vBinding.getViewModel().setCommandInProgress(true);
         vBinding.getViewModel().setDevState(DeviceState.STOPPING);

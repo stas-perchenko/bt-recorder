@@ -1,6 +1,9 @@
 package com.alperez.bt_microphone.rest.response;
 
+import android.location.Location;
+
 import com.alperez.bt_microphone.core.DeviceState;
+import com.alperez.bt_microphone.rest.RestUtils;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
 
 import org.json.JSONException;
@@ -20,21 +23,22 @@ class DeviceStatusImpl implements DeviceStatus {
     private DeviceState deviceState;
     private int recordingSampleRate;
     private int gainLevel;
+    private Location deviceLocation;
 
     public static DeviceStatusImpl fromJson(JSONObject jStatus) throws JSONException {
         DeviceStatusImpl model = new DeviceStatusImpl();
-
+        model.deviceLocation = RestUtils.parseLocationFromJson(jStatus);
         model.freeSpaceBytes = jStatus.getLong("space");
-        model.batteryLevel = jStatus.getInt("battery");
-        model.phantomPowerOn = jStatus.getBoolean("phantom");
+        model.batteryLevel = RestUtils.parseIntOptString(jStatus, "battery");
+        model.phantomPowerOn = RestUtils.parseBooleanOnOffFallback(jStatus, "phantom");
         try {
             model.deviceState = parseDeviceState(jStatus.getString("state"));
         } catch (IllegalArgumentException e) {
             String err = String.format("Wrong DeviceState enum value %s. Supported values - %s", jStatus.getString("state"), Arrays.toString(DeviceState.values()));
             throw new JSONException(err);
         }
-        model.recordingSampleRate = jStatus.getInt("frequency");
-        model.gainLevel = jStatus.getInt("gain");
+        model.recordingSampleRate = RestUtils.parseIntOptString(jStatus, "frequency");
+        model.gainLevel = RestUtils.parseIntOptString(jStatus, "gain");
 
         return model;
     }
@@ -84,5 +88,9 @@ class DeviceStatusImpl implements DeviceStatus {
     @Override
     public int gainLevel() {
         return gainLevel;
+    }
+
+    public Location getDeviceLocation() {
+        return deviceLocation;
     }
 }
