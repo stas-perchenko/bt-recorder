@@ -54,13 +54,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <LinearLayout android:id="@+id/control_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <!-- Row 0 -->
-            <LinearLayout
+            <LinearLayout android:id="@+id/row_0_container"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/row_height"
                 android:layout_weight="0"
@@ -78,7 +78,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Inverse"
+                        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Small.Inverse"
                         android:indeterminate="true"
                         android:visibility="@{viewModel.commandInProgress ? v.VISIBLE : v.GONE}"/>
 
@@ -148,7 +148,7 @@
             </LinearLayout>
 
             <!--===================================== Row 1 =========================================-->
-            <LinearLayout
+            <LinearLayout android:id="@+id/row_1_container"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/row_height"
                 android:layout_weight="0"
@@ -222,7 +222,7 @@
             </LinearLayout>
 
             <!--===================================== Row 2 =========================================-->
-            <LinearLayout
+            <LinearLayout android:id="@+id/row_2_container"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/row_height"
                 android:layout_weight="0"
@@ -294,7 +294,7 @@
             </LinearLayout>
 
             <!--===================================== Row 3 =========================================-->
-            <LinearLayout
+            <LinearLayout android:id="@+id/row_3_container"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/row_height"
                 android:layout_weight="0"
@@ -368,7 +368,7 @@
             </LinearLayout>
 
 
-            <TextView
+            <TextView android:id="@+id/title1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
@@ -382,7 +382,7 @@
                 android:background="@color/section_title_bg_color"/>
 
             <!--===================================== Row 4 =========================================-->
-            <LinearLayout
+            <LinearLayout android:id="@+id/row_4_container"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/row_height"
                 android:layout_weight="0"
@@ -481,7 +481,7 @@
             </LinearLayout>
 
             <!--===================================== Row 5 =========================================-->
-            <LinearLayout
+            <LinearLayout android:id="@+id/row_5_container"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/row_height"
                 android:layout_weight="0"
@@ -573,9 +573,9 @@
             </LinearLayout>
 
             <!--===================================== Row 6 =========================================-->
-            <LinearLayout
+            <LinearLayout android:id="@+id/row_6_container"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="36dp"
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 android:background="@color/colorPrimary">

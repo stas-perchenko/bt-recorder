@@ -189,12 +189,12 @@ public class RemoteDevice {
         }
     }
 
-    public void commandPhantomOn() {
-        scheduleNoParamCommand(PhantomOnRestCommand.class);
-    }
-
-    public void commandPhantomOff() {
-        scheduleNoParamCommand(PhantomOffRestCommand.class);
+    public void commandPhantomOnOff(boolean enabled) {
+        if (enabled) {
+            scheduleNoParamCommand(PhantomOnRestCommand.class);
+        } else {
+            scheduleNoParamCommand(PhantomOffRestCommand.class);
+        }
     }
 
     private void scheduleNoParamCommand(Class<? extends BaseRestCommand> commandClass) {

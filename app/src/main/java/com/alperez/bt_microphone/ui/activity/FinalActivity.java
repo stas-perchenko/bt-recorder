@@ -2,9 +2,12 @@ package com.alperez.bt_microphone.ui.activity;
 
 import android.bluetooth.BluetoothDevice;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.alperez.bt_microphone.R;
@@ -61,8 +64,41 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
         vBinding.setClickerGainDown((v) -> onGainDownClicked());
         vBinding.setClickerPrevTrack((v) -> onPrevTrackClicked());
         vBinding.setClickerNextTrack((v) -> onNextTrackClicked());
+        vBinding.setClickerPhantom((v) -> onPhantom());
+
+        vBinding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int controlH = getTotalChildrenHEight(vBinding.controlContainer);
 
 
+                int reqH = vBinding.getRoot().getHeight();
+                if (reqH != controlH) {
+                    int space = reqH - vBinding.row6Container.getLayoutParams().height - vBinding.title1.getMeasuredHeight();
+                    int rowH = Math.round(space / 6f);
+                    vBinding.row0Container.getLayoutParams().height = rowH;
+                    vBinding.row1Container.getLayoutParams().height = rowH;
+                    vBinding.row2Container.getLayoutParams().height = rowH;
+                    vBinding.row3Container.getLayoutParams().height = rowH;
+                    vBinding.row4Container.getLayoutParams().height = rowH;
+                    vBinding.row5Container.getLayoutParams().height = rowH;
+                    vBinding.getRoot().requestLayout();
+                }
+                if (Build.VERSION.SDK_INT >= 16) {
+                    vBinding.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                } else {
+                    vBinding.getRoot().getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+            }
+
+            private int getTotalChildrenHEight(ViewGroup vg) {
+                int h = 0;
+                for (int i=0; i<vg.getChildCount(); i++) {
+                    h += vg.getChildAt(i).getLayoutParams().height;
+                }
+                return h;
+            }
+        });
     }
 
     private ValidDeviceDbModel getDeviceArgument() {
@@ -82,7 +118,11 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
     @Override
     protected void onStart() {
         super.onStart();
-        getWindow().getDecorView().postDelayed(() -> remDevice.commandStatus(), 500);
+        getWindow().getDecorView().postDelayed(() -> {
+            remDevice.commandVersion();
+            remDevice.commandStatus();
+            remDevice.commandCurrentFile();
+        }, 600);
     }
 
     private void onStopClicked() {
@@ -126,6 +166,12 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
     private void onNextTrackClicked() {
         vBinding.getViewModel().setCommandInProgress(true);
         remDevice.commandNextFile();
+    }
+
+    private void onPhantom() {
+        boolean ph = !vBinding.getViewModel().isPhantomPower();
+        remDevice.commandPhantomOnOff(ph);
+        vBinding.getViewModel().setPhantomPower(ph);
     }
 
 
