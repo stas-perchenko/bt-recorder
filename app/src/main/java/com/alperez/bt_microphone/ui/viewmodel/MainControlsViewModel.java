@@ -30,7 +30,7 @@ public class MainControlsViewModel extends BaseObservable {
     private String memorySpace = "0";
     private String batteryLevel = "0";
     private boolean phantomPower;
-    private String sampleRate = "0";
+    private int recordingSampleRate = 0;
     private String gainLevel = "0";
 
 
@@ -86,7 +86,7 @@ public class MainControlsViewModel extends BaseObservable {
         setBatteryLevel(Integer.toString(devStatus.batteryLevel()));
         setPhantomPower(devStatus.isPhantomPowerOn());
         setGainLevel(Integer.toString(devStatus.gainLevel()));
-        setSampleRate(Integer.toString(devStatus.recordingSampleRate()));
+        setRecordingSampleRate(devStatus.recordingSampleRate());
     }
 
 
@@ -96,10 +96,8 @@ public class MainControlsViewModel extends BaseObservable {
         return devState;
     }
     public void setDevState(DeviceState devState) {
-        if (this.devState != devState) {
-            this.devState = devState;
-            notifyPropertyChanged(BR.devState);
-        }
+        this.devState = devState;
+        notifyPropertyChanged(BR.devState);
     }
     @Bindable
     public String getMemorySpace() {
@@ -141,11 +139,14 @@ public class MainControlsViewModel extends BaseObservable {
             notifyPropertyChanged(BR.gainLevel);
         }
     }
-    public String getSampleRate() {
-        return sampleRate;
+
+    @Bindable
+    public int getRecordingSampleRate() {
+        return recordingSampleRate;
     }
-    public void setSampleRate(String sampleRate) {
-        this.sampleRate = sampleRate;
+    public void setRecordingSampleRate(int recordingSampleRate) {
+        this.recordingSampleRate = recordingSampleRate;
+        notifyPropertyChanged(BR.recordingSampleRate);
     }
 
     /**********************************************************************************************/
@@ -153,16 +154,16 @@ public class MainControlsViewModel extends BaseObservable {
 
     /*****  File-related ********/
     private Date currentTimeStart = new Date(0);
-    private String currentDuration = "0";
-    private String currentPosition = "0";
+    private long currentDuration;
+    private long currentPosition;
     private String currentSampleRate = "0";
     private Location currentLocation = new Location("");
 
 
     public void setCurrentFile(DeviceFile devFile) {
         setCurrentTimeStart(devFile.startTime());
-        setCurrentDuration(Long.toString(devFile.durationMillis()));
-        setCurrentPosition(Long.toString(devFile.currentPosition()));
+        setCurrentDuration(devFile.durationMillis());
+        setCurrentPosition(devFile.currentPosition());
         setCurrentSampleRate(Integer.toString(devFile.sampleRate()));
         setCurrentLocation(devFile.geoLocation());
     }
@@ -181,24 +182,24 @@ public class MainControlsViewModel extends BaseObservable {
     }
 
     @Bindable
-    public String getCurrentDuration() {
-        return currentDuration;
+    public int getCurrentDuration() {
+        return (int)currentDuration;
     }
 
-    public void setCurrentDuration(String currentDuration) {
-        if (!currentDuration.equals(this.currentDuration)) {
+    public void setCurrentDuration(long currentDuration) {
+        if (currentDuration != this.currentDuration) {
             this.currentDuration = currentDuration;
             notifyPropertyChanged(BR.currentDuration);
         }
     }
 
     @Bindable
-    public String getCurrentPosition() {
-        return currentPosition;
+    public int getCurrentPosition() {
+        return (int)Math.min(currentPosition, currentDuration);
     }
 
-    public void setCurrentPosition(String currentPosition) {
-        if (!currentPosition.equals(this.currentPosition)) {
+    public void setCurrentPosition(long currentPosition) {
+        if (currentPosition != this.currentPosition) {
             this.currentPosition = currentPosition;
             notifyPropertyChanged(BR.currentPosition);
         }

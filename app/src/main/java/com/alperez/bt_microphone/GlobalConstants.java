@@ -25,4 +25,9 @@ public class GlobalConstants {
     public static final int MAX_TIME_AFTER_LAST_UUID_DISCOVERED = 4000;
 
     public static final int FORMAT_COMMAND_TIMEOUT = 8000;
+
+
+    public static final int SAMPLE_RATE_48K = 48000;
+    public static final int SAMPLE_RATE_96K = 96000;
+    public static final int SAMPLE_RATE_192K = 192000;
 }

@@ -2,6 +2,7 @@ package com.alperez.bt_microphone.ui;
 
 import android.databinding.BindingAdapter;
 import android.databinding.BindingConversion;
+import android.location.Location;
 import android.support.design.widget.TextInputLayout;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import com.alperez.bt_microphone.R;
 import com.alperez.bt_microphone.ui.viewmodel.BtDeviceViewModel;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -52,6 +54,27 @@ public class BindingAdapters {
     }
 
 
+    @BindingAdapter("recording_start")
+    public static void setTextView_Dtae1(TextView tv, Date d) {
+        tv.setText(dateToDateTimeString(d));
+    }
+
+    @BindingAdapter("date_only")
+    public static void setTextView_DateOnly(TextView tv, Date d) {
+        tv.setText(String.format("%1$td-%1$tm-%1$tY", d));
+    }
+
+    @BindingAdapter("time_only")
+    public static void setTextView_TimeOnly(TextView tv, Date d) {
+        tv.setText(String.format("%1$tH:%1$tM:%1$tS", d));
+    }
+
+    @BindingAdapter("duration_time")
+    public static void setTextView_DurationTime(TextView tv, long t) {
+        tv.setText(String.format("%1$tM:%1$tS.%1$tL", new Date(t)));
+    }
+
+
 
     /********************************  Automatic Conversions  *************************************/
     @BindingConversion
@@ -59,5 +82,34 @@ public class BindingAdapters {
         return String.format("%1$td-%1$tm-%1$tY", d);
     }
 
+    @BindingConversion
+    public static String convertToString(Location loc) {
+        return String.format("lat: %s\nlon: %s", latitudeToString(loc.getLatitude()), longitudeToString(loc.getLongitude()));
+    }
+
+
+
+
+
+
+
+
+
+    private static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd.MM.yyyy \u2192 HH:mm:ss.SSS");
+
+    public static String dateToDateTimeString(Date d) {
+        synchronized (dateTimeFormatter) {
+            return dateTimeFormatter.format(d);
+        }
+    }
+
+
+    public static final String latitudeToString(double latitude) {
+        return (latitude >= 0) ? String.format("%.5f\u00B0N", latitude) : String.format("%.5f\u00B0S", latitude);
+    }
+
+    public static final String longitudeToString(double longitude) {
+        return (longitude >= 0) ? String.format("%.5f\u00B0E", longitude) : String.format("%.5f\u00B0W", longitude);
+    }
 
 }

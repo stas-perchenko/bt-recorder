@@ -138,7 +138,13 @@
                         android:layout_height="match_parent"
                         app:theme="@style/ThemeButton.TogglableRed"
                         style="@style/ButtonLockable.Togglable"
-                        android:text="@string/action_record"
+
+                        android:textOff="@string/action_record"
+                        android:textOn="@string/action_record_active"
+
+                        android:checked="@{viewModel.devState == DS.RECORDING}"
+
+
                         android:enabled="@{!(viewModel.devState == DS.PLAYING)  &amp;&amp;  !(viewModel.devState == DS.PAUSED)}"
                         app:locked="@{viewModel.controlsLocked}"
                         app:onClickListener="@{clickerRecord}"/>
@@ -192,6 +198,7 @@
                         style="@style/ButtonLockable.Togglable"
                         android:textOff="@string/action_play"
                         android:textOn="@string/action_pause"
+                        android:checked="@{viewModel.devState == DS.PLAYING}"
                         android:enabled="@{!(viewModel.devState == DS.RECORDING)}"
                         app:locked="@{viewModel.controlsLocked}"
                         app:onClickListener="@{clickerPlayPause}"/>
@@ -373,7 +380,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:gravity="center_horizontal"
-                android:text="@string/section_title_rec_options"
+                android:text="@{(viewModel.devState==DS.PLAYING || viewModel.devState==DS.PAUSING || viewModel.devState==DS.PAUSED) ? @string/section_title_playback_progress : @string/section_title_rec_options}"
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
                 android:textStyle="bold"
@@ -416,7 +423,7 @@
                                 style="@style/ButtonLockable.Togglable"
                                 android:textOn="@string/action_quality_24_48"
                                 android:textOff="@string/action_quality_24_48"
-                                android:checked="@{viewModel.sampleRate.equals(48000)}"
+                                android:checked="@{viewModel.recordingSampleRate == com.alperez.bt_microphone.GlobalConstants.SAMPLE_RATE_48K}"
                                 app:locked="@{viewModel.optionsLocked || (viewModel.devState == DS.RECORDING)}"
                                 app:onClickListener="@{clickerSmprate1}" />
 
@@ -439,7 +446,7 @@
                                 style="@style/ButtonLockable.Togglable"
                                 android:textOn="@string/action_quality_24_96"
                                 android:textOff="@string/action_quality_24_96"
-                                android:checked="@{viewModel.sampleRate.equals(96000)}"
+                                android:checked="@{viewModel.recordingSampleRate == com.alperez.bt_microphone.GlobalConstants.SAMPLE_RATE_96K}"
                                 app:locked="@{viewModel.optionsLocked || (viewModel.devState == DS.RECORDING)}"
                                 app:onClickListener="@{clickerSmprate2}" />
 
@@ -462,7 +469,7 @@
                                 style="@style/ButtonLockable.Togglable"
                                 android:textOn="@string/action_quality_24_192"
                                 android:textOff="@string/action_quality_24_192"
-                                android:checked="@{viewModel.sampleRate.equals(192000)}"
+                                android:checked="@{viewModel.recordingSampleRate == com.alperez.bt_microphone.GlobalConstants.SAMPLE_RATE_192K}"
                                 app:locked="@{viewModel.optionsLocked || (viewModel.devState == DS.RECORDING)}"
                                 app:onClickListener="@{clickerSmprate3}" />
 
@@ -514,7 +521,7 @@
                                 android:layout_gravity="center"
                                 android:textStyle="bold"
                                 android:textSize="16sp"
-                                android:text="Date"/>
+                                app:date_only="@{viewModel.currentTimeStart}"/>
 
                         </FrameLayout>
 
@@ -534,7 +541,7 @@
                                 android:layout_gravity="center"
                                 android:textStyle="bold"
                                 android:textSize="16sp"
-                                android:text="Time"/>
+                                app:time_only="@{viewModel.currentTimeStart}" />
 
                         </FrameLayout>
 
@@ -554,7 +561,7 @@
                                 android:layout_gravity="center"
                                 android:textStyle="bold"
                                 android:textSize="16sp"
-                                android:text="GEO location"/>
+                                android:text="@{viewModel.currentLocation}"/>
 
                         </FrameLayout>
 
@@ -587,8 +594,6 @@
 
 
 
-
-
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -596,7 +601,7 @@
                     android:paddingTop="6dp"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
-                    android:visibility="@{(viewModel.devState==DS.PLAYING || viewModel.devState==DS.PLAYING) ? v.VISIBLE : v.INVISIBLE}">
+                    android:visibility="@{(viewModel.devState==DS.PLAYING || viewModel.devState==DS.PAUSING || viewModel.devState==DS.PAUSED) ? v.VISIBLE : v.INVISIBLE}">
 
                     <TextView android:id="@+id/start_point_title"
                         android:layout_width="wrap_content"
@@ -604,13 +609,24 @@
                         android:layout_alignParentTop="true"
                         android:layout_alignParentLeft="true"
                         android:text="Started at: "/>
-                    <TextView
+                    <TextView android:id="@+id/start_point_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toRightOf="@id/start_point_title"
                         android:layout_alignBaseline="@id/start_point_title"
                         android:layout_marginLeft="8dp"
-                        android:text="fghdfjgdg"/>
+                        app:recording_start="@{viewModel.currentTimeStart}"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/start_point_value"
+                        android:layout_alignBaseline="@id/start_point_title"
+                        android:layout_marginLeft="8dp"
+                        android:textColor="#909090"
+                        android:textSize="10dp"
+                        android:text="Location and SMP rate will be here"/>
+
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -621,17 +637,18 @@
                         <ProgressBar
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            style="@android:style/Widget.ProgressBar.Horizontal"
                             android:layout_weight="1"
                             android:indeterminate="false"
-                            android:max="100"
-                            android:progress="50"/>
+                            android:max="@{viewModel.currentDuration}"
+                            android:progress="@{viewModel.currentPosition}"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="0"
                             android:layout_marginLeft="8dp"
-                            android:text="1234"/>
+                            app:duration_time="@{viewModel.currentDuration}"/>
                     </LinearLayout>
 
                 </RelativeLayout>
@@ -656,7 +673,7 @@
                 <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="40">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -694,7 +711,7 @@
                 <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="60">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -717,7 +734,7 @@
                             android:textSize="15sp"
                             android:textStyle="bold"
                             android:textColor="#FFFFFF"
-                            android:text="@{viewModel.batteryLevel}"/>
+                            android:text="@{viewModel.memorySpace}"/>
 
                     </LinearLayout>
                 </FrameLayout>

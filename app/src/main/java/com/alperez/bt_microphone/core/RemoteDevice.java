@@ -32,11 +32,9 @@ import com.alperez.bt_microphone.rest.command.impl.VersionRestCommand;
 import com.alperez.bt_microphone.rest.response.BaseResponse;
 import com.alperez.bt_microphone.rest.response.ErrorResponse;
 import com.alperez.bt_microphone.rest.response.FileSuccessResponse;
-import com.alperez.bt_microphone.rest.response.PositionSuccessResponse;
 import com.alperez.bt_microphone.rest.response.SimpleSuccessResponse;
 import com.alperez.bt_microphone.rest.response.StatusSuccessResponse;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceFile;
-import com.alperez.bt_microphone.rest.response.commonmodels.DevicePosition;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
 import com.android.annotations.NonNull;
 

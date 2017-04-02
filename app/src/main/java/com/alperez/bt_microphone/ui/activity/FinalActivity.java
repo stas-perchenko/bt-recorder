@@ -81,6 +81,10 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
         vBinding.setClickerNextTrack((v) -> onNextTrackClicked());
         vBinding.setClickerPhantom((v) -> onPhantom());
 
+        vBinding.setClickerSmprate1((v) -> onNewRate(GlobalConstants.SAMPLE_RATE_48K));
+        vBinding.setClickerSmprate2((v) -> onNewRate(GlobalConstants.SAMPLE_RATE_96K));
+        vBinding.setClickerSmprate3((v) -> onNewRate(GlobalConstants.SAMPLE_RATE_192K));
+
         vBinding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -140,10 +144,26 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
         super.onStart();
         getWindow().getDecorView().postDelayed(() -> {
             remDevice.commandVersion();
-            remDevice.commandStatus();
             remDevice.commandCurrentFile();
+            remDevice.commandStatus();
         }, 600);
     }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mPlayer != null) mPlayer.release();
+        if (remDevice != null) remDevice.release();
+    }
+
+
+
+
+
+
+
+
 
     private void onStopClicked() {
         vBinding.getViewModel().setCommandInProgress(true);
@@ -152,9 +172,14 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
     }
 
     private void onRecordClicked() {
-        vBinding.getViewModel().setCommandInProgress(true);
-        vBinding.getViewModel().setDevState(DeviceState.START_RECORDING);
-        remDevice.commandRecord();
+        MainControlsViewModel vModel = vBinding.getViewModel();
+        if ((vModel.getDevState() != DeviceState.RECORDING) && (vModel.getDevState() != DeviceState.START_RECORDING)) {
+            vBinding.getViewModel().setCommandInProgress(true);
+            vBinding.getViewModel().setDevState(DeviceState.START_RECORDING);
+            remDevice.commandRecord();
+        } else {
+            vModel.setDevState(vModel.getDevState());
+        }
     }
 
     private void onPlayPauseClicked() {
@@ -188,10 +213,22 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
         remDevice.commandNextFile();
     }
 
+
+    private void onNewRate(int rate) {
+        MainControlsViewModel vModel = vBinding.getViewModel();
+        if (vModel.getRecordingSampleRate() != rate) {
+            vModel.setRecordingSampleRate(0);
+            remDevice.commandSetSampleRate(rate);
+        } else {
+            vModel.setRecordingSampleRate(rate);
+        }
+    }
+
     private void onPhantom() {
+        vBinding.getViewModel().setCommandInProgress(true);
         boolean ph = !vBinding.getViewModel().isPhantomPower();
         remDevice.commandPhantomOnOff(ph);
-        vBinding.getViewModel().setPhantomPower(ph);
+        //vBinding.getViewModel().setPhantomPower(ph);
     }
 
 
