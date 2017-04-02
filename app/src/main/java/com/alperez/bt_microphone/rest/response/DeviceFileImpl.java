@@ -19,6 +19,7 @@ class DeviceFileImpl implements DeviceFile {
 
     private Date startTime;
     private long durationMillis;
+    private long currentPosition;
     private int sampleRate;
     private Location geoLocation;
 
@@ -30,7 +31,8 @@ class DeviceFileImpl implements DeviceFile {
         } catch (ParseException e) {
             throw new JSONException("error parse date/time - "+dt);
         }
-        model.durationMillis = jFile.getLong("dur");
+        model.durationMillis = RestUtils.parseLongOptString(jFile, "duration");
+        model.currentPosition = RestUtils.parseLongOptString(jFile, "position");
         model.sampleRate = RestUtils.parseIntOptString(jFile, "freq");
         model.geoLocation = RestUtils.parseLocationFromJson(jFile);
         return model;
@@ -47,6 +49,11 @@ class DeviceFileImpl implements DeviceFile {
     @Override
     public long durationMillis() {
         return durationMillis;
+    }
+
+    @Override
+    public long currentPosition() {
+        return currentPosition;
     }
 
     @Override

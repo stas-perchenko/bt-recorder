@@ -11,6 +11,7 @@ import java.util.Date;
 public interface DeviceFile {
     Date startTime();
     long durationMillis();
+    long currentPosition();
     int sampleRate();
     Location geoLocation();
 }

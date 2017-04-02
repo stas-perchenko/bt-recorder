@@ -283,8 +283,6 @@ public class RemoteDevice {
                     uiHandler.post(() -> resultListener.onNewFile(currentDeviceFile = ((FileSuccessResponse) resp).getCurrentlySetFile()));
                 } else if (resp.success() && resp instanceof StatusSuccessResponse) {
                     uiHandler.post(() -> resultListener.onStatusUpdate(currentDeviceStatus = ((StatusSuccessResponse) resp).getDeviceStatus()));
-                } else if (resp.success() && resp instanceof PositionSuccessResponse) {
-                    uiHandler.post(() -> resultListener.onPositionUpdate(  ((PositionSuccessResponse) resp).getCurrentposition() ));
                 }
             } else {
                 if (!resp.success() && resp instanceof ErrorResponse) {
@@ -318,7 +316,6 @@ public class RemoteDevice {
     public interface OnCommandResultListener {
         void onStatusUpdate(DeviceStatus devStatus);
         void onNewFile(DeviceFile devFile);
-        void onPositionUpdate(DevicePosition position);
         void onSimpleCommandComplete(String commandName);
         void onDeviceResponseError(Class<? extends BaseRestCommand> commandClass, String reason);
         void onCommunicationError(Class<? extends BaseRestCommand> commandClass, String error);

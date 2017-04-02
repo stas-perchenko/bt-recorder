@@ -2,6 +2,9 @@ package com.alperez.bt_microphone.ui.activity;
 
 import android.bluetooth.BluetoothDevice;
 import android.databinding.DataBindingUtil;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,16 +13,18 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import com.alperez.bt_microphone.GlobalConstants;
 import com.alperez.bt_microphone.R;
 import com.alperez.bt_microphone.bluetoorh.BluetoothNotSupportedException;
 import com.alperez.bt_microphone.bluetoorh.BtUtils;
+import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundPlayer;
+import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundPlayerImpl;
 import com.alperez.bt_microphone.core.DeviceState;
 import com.alperez.bt_microphone.core.RemoteDevice;
 import com.alperez.bt_microphone.databinding.ActivityFinalBinding;
 import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.rest.command.BaseRestCommand;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceFile;
-import com.alperez.bt_microphone.rest.response.commonmodels.DevicePosition;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
 import com.alperez.bt_microphone.ui.viewmodel.MainControlsViewModel;
@@ -32,9 +37,17 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
     public static final String ARG_VALID_DEVICE_ID = "device_id";
 
     private RemoteDevice remDevice;
+    private BtSoundPlayer mPlayer;
 
 
     private ActivityFinalBinding vBinding;
+
+    private AudioTrack createAudioTrack() {
+        int minBufSizeBytes = AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_8BIT);
+        minBufSizeBytes = 1024;
+        return new AudioTrack(AudioManager.STREAM_MUSIC, 8000, AudioFormat.CHANNEL_OUT_MONO,
+                AudioFormat.ENCODING_PCM_8BIT, 2*minBufSizeBytes, AudioTrack.MODE_STREAM);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,6 +58,8 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
             ValidDeviceDbModel dbDevice = getDeviceArgument();
             BluetoothDevice btDevice = BtUtils.getBtAdapter(this).getRemoteDevice(dbDevice.macAddress());
             remDevice = new RemoteDevice(dbDevice.withBluetoothDevice(btDevice), 2000, this);
+
+            mPlayer = new BtSoundPlayerImpl(btDevice, GlobalConstants.UUID_SERVICE_2, createAudioTrack());
         } catch (BluetoothNotSupportedException e){
             finish();
             return;
@@ -80,8 +95,13 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
                     vBinding.row1Container.getLayoutParams().height = rowH;
                     vBinding.row2Container.getLayoutParams().height = rowH;
                     vBinding.row3Container.getLayoutParams().height = rowH;
+
+
+
                     vBinding.row4Container.getLayoutParams().height = rowH;
                     vBinding.row5Container.getLayoutParams().height = rowH;
+
+
                     vBinding.getRoot().requestLayout();
                 }
                 if (Build.VERSION.SDK_INT >= 16) {
@@ -186,18 +206,24 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
     public void onStatusUpdate(DeviceStatus devStatus) {
         vBinding.getViewModel().setCommandInProgress(false);
         vBinding.getViewModel().setDeviceStatus(devStatus);
+
+        switch (devStatus.deviceState()) {
+            case PLAYING:
+            case RECORDING:
+                mPlayer.play();
+                break;
+            case PAUSED:
+            case STOPPED:
+                mPlayer.pause();
+                break;
+        }
+
     }
 
     @Override
     public void onNewFile(DeviceFile devFile) {
         vBinding.getViewModel().setCommandInProgress(false);
         vBinding.getViewModel().setCurrentFile(devFile);
-    }
-
-    @Override
-    public void onPositionUpdate(DevicePosition position) {
-        vBinding.getViewModel().setCommandInProgress(false);
-        vBinding.getViewModel().setCurrentPosition(position);
     }
 
     @Override

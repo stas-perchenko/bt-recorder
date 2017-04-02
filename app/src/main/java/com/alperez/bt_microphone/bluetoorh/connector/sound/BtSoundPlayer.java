@@ -16,4 +16,5 @@ public interface BtSoundPlayer {
     boolean isConnected();
     boolean isPlaying();
     boolean isAudioTrackPlaying();
+
 }

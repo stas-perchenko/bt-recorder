@@ -75,6 +75,7 @@ public class BtConnector {
             soc.connect(); // Do the actual connecting job!!!!
             is = soc.getInputStream();
             os = soc.getOutputStream();
+            Thread.sleep(350);
         } catch (Exception e) {
             ThreadLog.e(TAG, "Connector execution failed - "+e.getMessage());
             BtUtils.silentlyCloseCloseable(is);

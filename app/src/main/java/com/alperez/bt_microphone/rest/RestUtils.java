@@ -45,11 +45,24 @@ public class RestUtils {
         try {
             return jObj.getInt(fieldName);
         } catch (JSONException e) {
-            String sInt = jObj.optString(fieldName, "false");
+            String sNum = jObj.optString(fieldName, "false");
             try {
-                return Integer.parseInt(sInt);
+                return Integer.parseInt(sNum);
             } catch (Exception e1) {
-                throw new JSONException("Wrong integer field value - "+sInt);
+                throw new JSONException("Wrong integer field value - "+sNum);
+            }
+        }
+    }
+
+    public static long parseLongOptString(JSONObject jObj, String fieldName) throws JSONException {
+        try {
+            return jObj.getLong(fieldName);
+        } catch (JSONException e) {
+            String sNum = jObj.optString(fieldName, "false");
+            try {
+                return Long.parseLong(sNum);
+            } catch (Exception e1) {
+                throw new JSONException("Wrong integer field value - "+sNum);
             }
         }
     }

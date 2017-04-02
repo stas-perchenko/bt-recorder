@@ -2,12 +2,14 @@ package com.alperez.bt_microphone.ui.viewmodel;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.location.Location;
 
 import com.alperez.bt_microphone.BR;
 import com.alperez.bt_microphone.core.DeviceState;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceFile;
-import com.alperez.bt_microphone.rest.response.commonmodels.DevicePosition;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
+
+import java.util.Date;
 
 /**
  * Created by stanislav.perchenko on 3/25/2017.
@@ -30,7 +32,6 @@ public class MainControlsViewModel extends BaseObservable {
     private boolean phantomPower;
     private String sampleRate = "0";
     private String gainLevel = "0";
-
 
 
 
@@ -149,18 +150,81 @@ public class MainControlsViewModel extends BaseObservable {
 
     /**********************************************************************************************/
 
+
+    /*****  File-related ********/
+    private Date currentTimeStart = new Date(0);
+    private String currentDuration = "0";
+    private String currentPosition = "0";
+    private String currentSampleRate = "0";
+    private Location currentLocation = new Location("");
+
+
     public void setCurrentFile(DeviceFile devFile) {
-        //TODO Implement this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        setCurrentTimeStart(devFile.startTime());
+        setCurrentDuration(Long.toString(devFile.durationMillis()));
+        setCurrentPosition(Long.toString(devFile.currentPosition()));
+        setCurrentSampleRate(Integer.toString(devFile.sampleRate()));
+        setCurrentLocation(devFile.geoLocation());
     }
 
 
-
-
-
-    /**********************************************************************************************/
-
-    public void setCurrentPosition(DevicePosition position) {
-        //TODO Implement this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    @Bindable
+    public Date getCurrentTimeStart() {
+        return currentTimeStart;
     }
 
+    public void setCurrentTimeStart(Date currentTimeStart) {
+        if (!currentTimeStart.equals(this.currentTimeStart)) {
+            this.currentTimeStart = currentTimeStart;
+            notifyPropertyChanged(BR.currentTimeStart);
+        }
+    }
+
+    @Bindable
+    public String getCurrentDuration() {
+        return currentDuration;
+    }
+
+    public void setCurrentDuration(String currentDuration) {
+        if (!currentDuration.equals(this.currentDuration)) {
+            this.currentDuration = currentDuration;
+            notifyPropertyChanged(BR.currentDuration);
+        }
+    }
+
+    @Bindable
+    public String getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public void setCurrentPosition(String currentPosition) {
+        if (!currentPosition.equals(this.currentPosition)) {
+            this.currentPosition = currentPosition;
+            notifyPropertyChanged(BR.currentPosition);
+        }
+    }
+
+    @Bindable
+    public String getCurrentSampleRate() {
+        return currentSampleRate;
+    }
+
+    public void setCurrentSampleRate(String currentSampleRate) {
+        if (!currentSampleRate.equals(this.currentSampleRate)) {
+            this.currentSampleRate = currentSampleRate;
+            notifyPropertyChanged(BR.currentSampleRate);
+        }
+    }
+
+    @Bindable
+    public Location getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(Location currentLocation) {
+        if (currentLocation.distanceTo(this.currentLocation) > 10) {
+            this.currentLocation = currentLocation;
+            notifyPropertyChanged(BR.currentLocation);
+        }
+    }
 }
