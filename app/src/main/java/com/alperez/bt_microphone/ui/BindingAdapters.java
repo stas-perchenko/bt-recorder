@@ -69,6 +69,11 @@ public class BindingAdapters {
         tv.setText(String.format("%1$tH:%1$tM:%1$tS", d));
     }
 
+    @BindingAdapter("date_and_time")
+    public static void setTextView_DateAndTime(TextView tv, Date d) {
+        tv.setText(String.format("%1$td-%1$tm-%1$tY \u2192 %1$tH:%1$tM:%1$tS", d));
+    }
+
     @BindingAdapter("duration_time")
     public static void setTextView_DurationTime(TextView tv, long t) {
         tv.setText(String.format("%1$tM:%1$tS.%1$tL", new Date(t)));

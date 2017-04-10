@@ -26,6 +26,7 @@ public class MainControlsViewModel extends BaseObservable {
 
 
     /***** Status-related ********/
+    private Date deviceTime = new Date(0);
     private DeviceState devState = DeviceState.UNDEFINED;
     private String memorySpace = "0";
     private String batteryLevel = "0";
@@ -81,6 +82,7 @@ public class MainControlsViewModel extends BaseObservable {
      * @param devStatus
      */
     public void setDeviceStatus(DeviceStatus devStatus) {
+        setDeviceTime(devStatus.deviceTime());
         setDevState(devStatus.deviceState());
         setMemorySpace(Long.toString(devStatus.freeSpaceBytes()));
         setBatteryLevel(Integer.toString(devStatus.batteryLevel()));
@@ -90,6 +92,17 @@ public class MainControlsViewModel extends BaseObservable {
     }
 
 
+    @Bindable
+    public Date getDeviceTime() {
+        return deviceTime;
+    }
+
+    public void setDeviceTime(Date deviceTime) {
+        if (!deviceTime.equals(this.deviceTime)) {
+            this.deviceTime = deviceTime;
+            notifyPropertyChanged(BR.deviceTime);
+        }
+    }
 
     @Bindable
     public DeviceState getDevState() {

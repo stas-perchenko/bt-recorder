@@ -9,7 +9,9 @@ import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * Created by Stas on 27.03.2017.
@@ -17,6 +19,7 @@ import java.util.Arrays;
 
 class DeviceStatusImpl implements DeviceStatus {
 
+    private Date deviceTime;
     private long freeSpaceBytes;
     private int batteryLevel;
     private boolean phantomPowerOn;
@@ -27,6 +30,13 @@ class DeviceStatusImpl implements DeviceStatus {
 
     public static DeviceStatusImpl fromJson(JSONObject jStatus) throws JSONException {
         DeviceStatusImpl model = new DeviceStatusImpl();
+        String dt = jStatus.getString("time");
+        try {
+            model.deviceTime = RestUtils.parseRemoteDateTime(dt);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new JSONException("Wrong time format - "+dt);
+        }
         model.deviceLocation = RestUtils.parseLocationFromJson(jStatus);
         model.freeSpaceBytes = jStatus.getLong("space");
         model.batteryLevel = RestUtils.parseIntOptString(jStatus, "battery");
@@ -59,6 +69,11 @@ class DeviceStatusImpl implements DeviceStatus {
 
 
     private DeviceStatusImpl(){}
+
+    @Override
+    public Date deviceTime() {
+        return deviceTime;
+    }
 
     @Override
     public long freeSpaceBytes() {

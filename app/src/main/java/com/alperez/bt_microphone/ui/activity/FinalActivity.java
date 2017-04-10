@@ -29,6 +29,8 @@ import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
 import com.alperez.bt_microphone.ui.viewmodel.MainControlsViewModel;
 
+import java.util.Date;
+
 /**
  * Created by stanislav.perchenko on 3/24/2017.
  */
@@ -80,6 +82,9 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
         vBinding.setClickerPrevTrack((v) -> onPrevTrackClicked());
         vBinding.setClickerNextTrack((v) -> onNextTrackClicked());
         vBinding.setClickerPhantom((v) -> onPhantom());
+
+        vBinding.setClickerForward((v) -> onForward(10));
+        vBinding.setClickerReverse((v) -> onReverse(10));
 
         vBinding.setClickerSmprate1((v) -> onNewRate(GlobalConstants.SAMPLE_RATE_48K));
         vBinding.setClickerSmprate2((v) -> onNewRate(GlobalConstants.SAMPLE_RATE_96K));
@@ -213,6 +218,13 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
         remDevice.commandNextFile();
     }
 
+    private void onForward(int seconds) {
+        remDevice.commandFastForward(seconds);
+    }
+
+    private void onReverse(int seconds) {
+        remDevice.commandFastReverse(seconds);
+    }
 
     private void onNewRate(int rate) {
         MainControlsViewModel vModel = vBinding.getViewModel();
@@ -236,13 +248,16 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
 
 
 
-
-
+    private boolean gotStateFirstTime = true;
 
     @Override
     public void onStatusUpdate(DeviceStatus devStatus) {
         vBinding.getViewModel().setCommandInProgress(false);
         vBinding.getViewModel().setDeviceStatus(devStatus);
+        if (gotStateFirstTime) {
+            gotStateFirstTime = false;
+            vBinding.getRoot().post(() -> remDevice.commandSetTime(new Date()));
+        }
 
         switch (devStatus.deviceState()) {
             case PLAYING:

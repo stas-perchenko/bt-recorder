@@ -171,6 +171,12 @@ public class BtSoundPlayerImpl implements BtSoundPlayer {
                     if (playEnabled.get()) {
                         //--- Mode PLAY ---
                         aTrack.write(buffer, 0, nBytes);
+
+
+                        //TODO Update level meter here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
                         ThreadLog.d(TAG, nBytes+" bytes writen ~~~~~~");
                         if (!trackPlaying.get()) {
                             cntrPrePlayBytes += nBytes;
