@@ -23,6 +23,7 @@ public class BtSoundPlayerImpl implements BtSoundPlayer {
 
     private static final int MAX_FRAME_SIZE = 512;
 
+    private SoundLevelMeter soundLevelMeter;
 
     private BluetoothDevice device;
     private UUID serviceUUID;
@@ -49,10 +50,11 @@ public class BtSoundPlayerImpl implements BtSoundPlayer {
      */
     private final AtomicBoolean connected = new AtomicBoolean(false);
 
-    public BtSoundPlayerImpl(BluetoothDevice device, UUID serviceUUID, AudioTrack aTrack) {
+    public BtSoundPlayerImpl(BluetoothDevice device, UUID serviceUUID, AudioTrack aTrack, SoundLevelMeter soundLevelMeter) {
         this.device = device;
         this.serviceUUID = serviceUUID;
         this.aTrack = aTrack;
+        this.soundLevelMeter = soundLevelMeter;
 
         workThread = new Thread(() -> workerMethodFinalized(), "bt-player");
         workThread.start();
@@ -173,8 +175,7 @@ public class BtSoundPlayerImpl implements BtSoundPlayer {
                         aTrack.write(buffer, 0, nBytes);
 
 
-                        //TODO Update level meter here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+                        soundLevelMeter.submitSamples(buffer, 0, nBytes);
 
 
                         ThreadLog.d(TAG, nBytes+" bytes writen ~~~~~~");

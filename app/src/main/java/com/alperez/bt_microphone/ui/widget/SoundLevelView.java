@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -17,12 +18,12 @@ public class SoundLevelView extends View {
     public static final float THRESHOLD_LO = 0.6f;
     public static final float THRESHOLD_HI = 0.85f;
 
-    public static final int COLOR_1_INACTIVE = Color.parseColor("#9CDB9A");
-    public static final int COLOR_1_ACTIVE = Color.parseColor("#09FF00");
-    public static final int COLOR_2_INACTIVE = Color.parseColor("#D9DB9A");
+    public static final int COLOR_1_INACTIVE = Color.parseColor("#000000");
+    public static final int COLOR_1_ACTIVE = Color.parseColor("#28DB18");
+    public static final int COLOR_2_INACTIVE = Color.parseColor("#000000");
     public static final int COLOR_2_ACTIVE = Color.parseColor("#F6FF00");
-    public static final int COLOR_3_INACTIVE = Color.parseColor("#D989B7");
-    public static final int COLOR_3_ACTIVE = Color.parseColor("#FF0095");
+    public static final int COLOR_3_INACTIVE = Color.parseColor("#000000");
+    public static final int COLOR_3_ACTIVE = Color.parseColor("#F50C10");
 
     private int level;
     private int maxLevel;
@@ -88,7 +89,7 @@ public class SoundLevelView extends View {
 
 
     public void setLevel(int level) {
-        this.level = level;
+        this.level = Math.min(maxLevel, level);
         updateLevelPx();
         invalidate();
     }
@@ -125,6 +126,7 @@ public class SoundLevelView extends View {
         } else {
             levelPx = 0;
         }
+        //Log.d("Level-Meter", String.format("Update level W=%d, maxLev=%d, level=%d, levPx=%d", widthPx, maxLevel, level, levelPx));
     }
 
 

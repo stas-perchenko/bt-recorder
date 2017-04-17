@@ -77,80 +77,101 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
                     android:layout_weight="2"
-                    android:background="#C0C0C0">
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    android:background="#D0D0D0">
+
+                    <ProgressBar
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_weight="0"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Small.Inverse"
+                        android:indeterminate="true"
+                        android:visibility="@{viewModel.commandInProgress ? v.VISIBLE : v.INVISIBLE}"/>
 
-                        <ProgressBar
-                            android:layout_width="wrap_content"
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Small.Inverse"
-                            android:indeterminate="true"
-                            android:visibility="@{viewModel.commandInProgress ? v.VISIBLE : v.INVISIBLE}"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                            android:textSize="14sp"
-                            android:textColor="#909090"
-                            android:text="State:"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="8dp"
-                            android:textStyle="bold"
-                            android:textSize="14sp"
-                            android:text="@{viewModel.devState.getUiTextValue}"/>
+                            android:orientation="horizontal">
 
 
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                                android:textSize="10sp"
+                                android:textColor="#909090"
+                                android:text="State:"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="8dp"
+                                android:textStyle="bold"
+                                android:textSize="10sp"
+                                android:text="@{viewModel.devState.getUiTextValue}"/>
 
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="12dp"
-                            android:textSize="14sp"
-                            android:textColor="#909090"
-                            android:text="Gain:"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="12dp"
+                                android:textSize="10sp"
+                                android:textColor="#909090"
+                                android:text="Gain:"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="8dp"
-                            android:textStyle="bold"
-                            android:textSize="14sp"
-                            android:text="@{viewModel.gainLevel}"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="8dp"
+                                android:textStyle="bold"
+                                android:textSize="10sp"
+                                android:text="@{viewModel.gainLevel}"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="12dp"
-                            android:textSize="14sp"
-                            android:textColor="#909090"
-                            android:text="Device time:"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="12dp"
+                                android:textSize="10sp"
+                                android:textColor="#909090"
+                                android:text="Device time:"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="8dp"
-                            android:textStyle="bold"
-                            android:textSize="14sp"
-                            app:date_and_time="@{viewModel.deviceTime}"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="8dp"
+                                android:textStyle="bold"
+                                android:textSize="10sp"
+                                app:date_and_time="@{viewModel.deviceTime}"/>
+
+                        </LinearLayout>
+
+
+                        <com.alperez.bt_microphone.ui.widget.SoundLevelView
+                            android:id="@+id/level_peak"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_marginTop="4dp"/>
+                        <com.alperez.bt_microphone.ui.widget.SoundLevelView
+                            android:id="@+id/level_rms"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_marginTop="6dp"/>
 
                     </LinearLayout>
+
+
+
                 </LinearLayout>
 
 
@@ -282,7 +303,7 @@
                         app:theme="@style/ThemeButton.RegularGray"
                         style="@style/ButtonLockable.Regular"
                         android:text="@string/action_rev"
-                        android:enabled="@{viewModel.devState == DS.PLAYING}"
+                        android:enabled="@{viewModel.devState == DS.PLAYING || viewModel.devState == DS.PAUSED}"
                         app:locked="@{viewModel.controlsLocked}"
                         app:onClickListener="@{clickerReverse}"/>
 
@@ -304,7 +325,7 @@
                         app:theme="@style/ThemeButton.RegularGray"
                         style="@style/ButtonLockable.Regular"
                         android:text="@string/action_fvd"
-                        android:enabled="@{viewModel.devState == DS.PLAYING}"
+                        android:enabled="@{viewModel.devState == DS.PLAYING || viewModel.devState == DS.PAUSED}"
                         app:locked="@{viewModel.controlsLocked}"
                         app:onClickListener="@{clickerForward}"/>
 
@@ -667,21 +688,39 @@
                         android:orientation="horizontal"
                         android:layout_below="@id/start_point_title"
                         android:gravity="center_vertical">
-                        <ProgressBar
+
+                        <FrameLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            style="@android:style/Widget.ProgressBar.Horizontal"
-                            android:layout_weight="1"
-                            android:indeterminate="false"
-                            android:max="@{viewModel.currentDuration}"
-                            android:progress="@{viewModel.currentPosition}"/>
+                            android:layout_weight="1">
+
+
+                            <ProgressBar
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                style="@android:style/Widget.ProgressBar.Horizontal"
+                                android:indeterminate="false"
+                                android:max="@{viewModel.currentDuration}"
+                                android:progress="@{viewModel.currentPosition}"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:textColor="#FFFFFF"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                app:time_from_millis="@{viewModel.currentPosition}"/>
+
+
+                        </FrameLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="0"
                             android:layout_marginLeft="8dp"
-                            app:duration_time="@{viewModel.currentDuration}"/>
+                            app:time_from_millis="@{viewModel.currentDuration}"/>
                     </LinearLayout>
 
                 </RelativeLayout>

@@ -69,7 +69,7 @@ public class RestUtils {
 
 
     /*******************  Parsing/Formatting date-time for communication purposes  ****************/
-    private static final String REST_DATE_TIME_FORMAT = "%1$tFT%1$tT.%1$tL";
+    private static final String REST_DATE_TIME_FORMAT = "%1$tFT%1$tT.%1$tL%1$tz";
 
     public static final String dateToRemoteString(Date d) {
         synchronized (REST_DATE_TIME_FORMAT) {

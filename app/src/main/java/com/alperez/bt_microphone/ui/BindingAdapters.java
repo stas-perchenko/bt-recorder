@@ -74,10 +74,12 @@ public class BindingAdapters {
         tv.setText(String.format("%1$td-%1$tm-%1$tY \u2192 %1$tH:%1$tM:%1$tS", d));
     }
 
-    @BindingAdapter("duration_time")
-    public static void setTextView_DurationTime(TextView tv, long t) {
-        tv.setText(String.format("%1$tM:%1$tS.%1$tL", new Date(t)));
+    @BindingAdapter("time_from_millis")
+    public static void setTextView_TimeFromMillis(TextView tv, long t) {
+        timeFromMillisDate.setTime(t);
+        tv.setText(String.format("%1$tM:%1$tS.%1$tL", timeFromMillisDate));
     }
+    private static Date timeFromMillisDate = new Date();
 
 
 

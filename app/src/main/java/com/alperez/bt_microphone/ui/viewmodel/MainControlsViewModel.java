@@ -39,10 +39,6 @@ public class MainControlsViewModel extends BaseObservable {
 
 
 
-
-
-
-
     @Bindable
     public boolean isControlsLocked() {
         return controlsLocked;
@@ -89,6 +85,15 @@ public class MainControlsViewModel extends BaseObservable {
         setPhantomPower(devStatus.isPhantomPowerOn());
         setGainLevel(Integer.toString(devStatus.gainLevel()));
         setRecordingSampleRate(devStatus.recordingSampleRate());
+
+
+        switch (devStatus.deviceState()) {
+            case UNDEFINED:
+            case STOPPED:
+            case RECORDING:
+                setCurrentPosition(0);
+        }
+
     }
 
 
@@ -168,7 +173,7 @@ public class MainControlsViewModel extends BaseObservable {
     /*****  File-related ********/
     private Date currentTimeStart = new Date(0);
     private long currentDuration;
-    private long currentPosition;
+    private float currentPosition;
     private String currentSampleRate = "0";
     private Location currentLocation = new Location("");
 
@@ -212,11 +217,17 @@ public class MainControlsViewModel extends BaseObservable {
     }
 
     public void setCurrentPosition(long currentPosition) {
-        if (currentPosition != this.currentPosition) {
-            this.currentPosition = currentPosition;
-            notifyPropertyChanged(BR.currentPosition);
-        }
+        this.currentPosition = currentPosition;
+        notifyPropertyChanged(BR.currentPosition);
     }
+
+    public void addTimePlayed(float timeMillis) {
+        currentPosition += timeMillis;
+        notifyPropertyChanged(BR.currentPosition);
+    }
+
+
+
 
     @Bindable
     public String getCurrentSampleRate() {

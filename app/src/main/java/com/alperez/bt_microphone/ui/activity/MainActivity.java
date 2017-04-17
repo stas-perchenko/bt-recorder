@@ -122,7 +122,7 @@ public class MainActivity extends BaseActivity {
             });
 
 
-            mPlayer = new BtSoundPlayerImpl(device, GlobalConstants.UUID_SERVICE_2, createAudioTrack());
+            mPlayer = new BtSoundPlayerImpl(device, GlobalConstants.UUID_SERVICE_2, createAudioTrack(), null);
             mPlayer.setOnPlayerPerformanceListener(new OnPlayerPerformanceListener() {
                 @Override
                 public void onBytesReceived(int nBytes) {

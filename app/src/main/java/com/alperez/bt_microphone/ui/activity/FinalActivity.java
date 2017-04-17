@@ -19,6 +19,9 @@ import com.alperez.bt_microphone.bluetoorh.BluetoothNotSupportedException;
 import com.alperez.bt_microphone.bluetoorh.BtUtils;
 import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundPlayer;
 import com.alperez.bt_microphone.bluetoorh.connector.sound.BtSoundPlayerImpl;
+import com.alperez.bt_microphone.bluetoorh.connector.sound.OnPlayerPerformanceListener;
+import com.alperez.bt_microphone.bluetoorh.connector.sound.OnSoundLevelListener;
+import com.alperez.bt_microphone.bluetoorh.connector.sound.SoundLevelMeter;
 import com.alperez.bt_microphone.core.DeviceState;
 import com.alperez.bt_microphone.core.RemoteDevice;
 import com.alperez.bt_microphone.databinding.ActivityFinalBinding;
@@ -30,6 +33,8 @@ import com.alperez.bt_microphone.storage.DatabaseAdapter;
 import com.alperez.bt_microphone.ui.viewmodel.MainControlsViewModel;
 
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by stanislav.perchenko on 3/24/2017.
@@ -61,7 +66,21 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
             BluetoothDevice btDevice = BtUtils.getBtAdapter(this).getRemoteDevice(dbDevice.macAddress());
             remDevice = new RemoteDevice(dbDevice.withBluetoothDevice(btDevice), 2000, this);
 
-            mPlayer = new BtSoundPlayerImpl(btDevice, GlobalConstants.UUID_SERVICE_2, createAudioTrack());
+            mPlayer = new BtSoundPlayerImpl(btDevice, GlobalConstants.UUID_SERVICE_2, createAudioTrack(), new SoundLevelMeter((rms, peak) -> {
+                vBinding.levelPeak.setLevel(peak);
+                vBinding.levelRms.setLevel(Math.round(rms * 2.5f));
+            }));
+            mPlayer.setOnPlayerPerformanceListener(new OnPlayerPerformanceListener() {
+                @Override
+                public void onBytesReceived(int nBytes) {
+
+                }
+
+                @Override
+                public void onBytesPlayed(int nBytes) {
+                    vBinding.getViewModel().addTimePlayed(nBytes / 8f);
+                }
+            });
         } catch (BluetoothNotSupportedException e){
             finish();
             return;
@@ -71,6 +90,9 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
         vBinding = DataBindingUtil.setContentView(this, R.layout.activity_final);
         vBinding.setViewModel(new MainControlsViewModel());
         vBinding.inProgressCoverView.setOnClickListener((v) -> {/* For touch interception */});
+
+        vBinding.levelPeak.setMaxLevel(128);
+        vBinding.levelRms.setMaxLevel(128);
 
         vBinding.actionSettings.setOnClickListener(v -> {});
 
@@ -152,7 +174,25 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
             remDevice.commandCurrentFile();
             remDevice.commandStatus();
         }, 600);
+
+        mStatusTimer = new Timer();
+        mStatusTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (vBinding.getViewModel().getDevState() == DeviceState.PLAYING) {
+                    remDevice.commandStatus();
+                }
+            }
+        }, 1000, 800);
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mStatusTimer.cancel();
+    }
+
+    private Timer mStatusTimer;
 
 
     @Override
@@ -267,6 +307,12 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
             case PAUSED:
             case STOPPED:
                 mPlayer.pause();
+
+
+                vBinding.getRoot().postDelayed(()->{
+                    vBinding.levelRms.setLevel(0);
+                    vBinding.levelPeak.setLevel(0);
+                }, 150);
                 break;
         }
 
