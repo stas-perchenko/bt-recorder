@@ -39,6 +39,12 @@
     <color name="btn_orange_off_stroke">#BFAC17</color>
 
 
+    <color name="btn_black_on_fill">#191919</color>
+    <color name="btn_black_on_stroke">#000000</color>
+    <color name="btn_black_off_fill">#E2E2E2</color>
+    <color name="btn_black_off_stroke">#000000</color>
+
+
     <color name="section_title_text_color">#FFFFFF</color>
     <color name="section_title_bg_color">@color/colorPrimary</color>
 </resources>

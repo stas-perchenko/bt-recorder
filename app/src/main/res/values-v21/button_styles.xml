@@ -64,6 +64,13 @@
         <item name="att_color_btn_enabled_off_stroke">@color/btn_orange_off_stroke</item>
     </style>
 
+    <style name="ThemeButton.TogglableBlack">
+        <item name="att_color_btn_enabled_on_fill">@color/btn_black_on_fill</item>
+        <item name="att_color_btn_enabled_on_stroke">@color/btn_black_on_stroke</item>
+        <item name="att_color_btn_enabled_off_fill">@color/btn_black_off_fill</item>
+        <item name="att_color_btn_enabled_off_stroke">@color/btn_black_off_stroke</item>
+    </style>
+
 
 
 </resources>

@@ -1,5 +1,7 @@
 package com.alperez.bt_microphone.rest.response.commonmodels;
 
+import android.location.Location;
+
 import com.alperez.bt_microphone.core.DeviceState;
 
 import java.util.Date;
@@ -16,4 +18,6 @@ public interface DeviceStatus {
     DeviceState deviceState();
     int recordingSampleRate();
     int gainLevel();
+    Location deviceLocation();
+    int memoryCardstatus();
 }

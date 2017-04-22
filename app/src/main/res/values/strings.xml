@@ -39,4 +39,29 @@
     <string name="section_title_rec_options">Recording Options</string>
     <string name="section_title_playback_progress">Playback progress</string>
 
+    <string name="recording_time_left">Recording time left</string>
+
+
+    <string name="settings_dialog_title">Setting actions</string>
+    <string name="action_show_memory_status">View SD card status</string>
+    <string name="action_memory_format">Format memory card</string>
+    <string name="action_set_time">Set current time</string>
+
+    <string name="dialog_format_title">Format Memory Card</string>
+    <string name="dialog_format_message">All data will be lost. Are you sure?</string>
+
+    <string name="msg_formatting_progress">Formatting memory card.\nThis will take a while...</string>
+    <string name="msg_formatting_error">Format memory card failed</string>
+    <string name="msg_formatting_ok">Memory card formatted</string>
+
+    <string name="dialog_mem_card_status_title">Memory card status</string>
+
+    <string name="memory_card_status_undef">Memory card status is not defined yet</string>
+    <string name="memory_card_status_0">Card exists and ready to work</string>
+    <string name="memory_card_status_1">A hard error occurred in the low level disk I/O layer</string>
+    <string name="memory_card_status_2">The physical drive cannot work</string>
+    <string name="memory_card_status_3">Access denied due to prohibited access or directory full</string>
+    <string name="memory_card_status_4">The physical drive is write protected</string>
+    <string name="memory_card_status_5">There is no valid FAT volume</string>
+
 </resources>

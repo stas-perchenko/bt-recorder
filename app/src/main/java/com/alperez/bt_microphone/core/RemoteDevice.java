@@ -24,6 +24,7 @@ import com.alperez.bt_microphone.rest.command.impl.PlayRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.PowerOffRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.PrevFileRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.RecordRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.SetLocationLommand;
 import com.alperez.bt_microphone.rest.command.impl.SetSampleRateRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.SetTimeRestCommand;
 import com.alperez.bt_microphone.rest.command.impl.StatusRestCommand;
@@ -145,8 +146,15 @@ public class RemoteDevice {
         }
     }
 
-    public void commandSetLocation(Location location) {
-        //TODO Implement later !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    public void commandSetLocation(@NonNull Location location) {
+
+        try {
+            SetLocationLommand comm = (SetLocationLommand) mCommandPool.getCommand(SetLocationLommand.class.getName());
+            comm.setLocation(location);
+            commandExecutor.execute(new CommandHandler(comm, commandTimeout));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void commandSetSampleRate(int sampleRate) {
@@ -215,6 +223,13 @@ public class RemoteDevice {
 
         public BaseRestCommand getCommand(String className) throws Exception {
             BaseRestCommand comm = commandMap.get(className);
+
+
+            if (comm != null) {
+                comm.release();
+                comm = null;
+            }
+
             if (comm == null) {
                 comm = ((Class<BaseRestCommand>) Class.forName(className)).getConstructor(BtDataTransceiver.class).newInstance(mDevice.getDataTransceiver());
                 commandMap.put(className, comm);
@@ -292,6 +307,7 @@ public class RemoteDevice {
 
         } catch (IOException e) {
             Log.e(TAG, "~~~~> Commend error - "+e.getMessage(), e);
+            try { Log.e(TAG, "~~~~> Commend - "+command.getCommandBody()); } catch (IOException e1) {}
             e.printStackTrace();
             if (callback == null) {
                 uiHandler.post(() -> {

@@ -30,6 +30,8 @@ public abstract class BaseRestCommand {
     private JSONObject jResponse;
 
     public BaseRestCommand(@NonNull BtDataTransceiver dataTransceiver) {
+        currentSequenceNumber.set(nextSequenceNumber());
+
         this.dataTransceiver = dataTransceiver
                 .addOnTransceiverStatusListener(connStatusListener)
                 .addOnTextDataReceivedListener(rcvListener);
@@ -38,6 +40,18 @@ public abstract class BaseRestCommand {
     public final void release() {
         dataTransceiver.removeOnTextDataReceivedListener(rcvListener);
         dataTransceiver.removeOnTransceiverStatusListener(connStatusListener);
+    }
+
+    public String getCommandBody() throws IOException {
+        JSONObject jBody = new JSONObject();
+        try {
+            jBody.put("id", currentSequenceNumber.get());
+            jBody.put("command", getCommandName());
+            fillInRequestBody(jBody);
+            return jBody.toString();
+        } catch (JSONException e) {
+            throw new IOException("Error build request body", e);
+        }
     }
 
     /**
@@ -49,22 +63,12 @@ public abstract class BaseRestCommand {
      * @throws IOException in case of timeout or other communication error.
      */
     public final BaseResponse sendBlocked(int timeoutMillis) throws IOException {
-        int seqNumber = nextSequenceNumber();
-        currentSequenceNumber.set(seqNumber);
 
         //----  Build request body  ----
-        JSONObject jBody = new JSONObject();
-        try {
-            jBody.put("id", seqNumber);
-            jBody.put("command", getCommandName());
-            fillInRequestBody(jBody);
-        } catch (JSONException e) {
-            throw new IOException("Error build request body", e);
-        }
+        String text = getCommandBody();
 
         //----  send request async  ----
-        String text = jBody.toString();
-        Log.i(TAG, "====> Send command - "+text);
+        Log.i(TAG, currentSequenceNumber+" "+getCommandName()+" ====> Send command - "+text);
         dataTransceiver.sendDataNonBlocked(text);
 
         //----  Wait for the response with timeout  ----
@@ -73,18 +77,18 @@ public abstract class BaseRestCommand {
                 zsgdunLock.wait(timeoutMillis);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                Log.e(TAG, "!!!!!!!  Waiting thread was interrupted !!!!!!!");
+                Log.e(TAG,  currentSequenceNumber+" "+getCommandName()+" !!!!!!!  Waiting thread was interrupted !!!!!!!");
                 throw new IOException("Receiving was interrupted");
             }
             if (jResponse == null) {
-                Log.e(TAG, "~~~~>  Command answer receive timeout!");
+                Log.e(TAG,  currentSequenceNumber+" "+getCommandName()+" ~~~~>  Command answer receive timeout!");
                 throw new IOException("Timeout - response was not received in time!");
             }
             try {
-                Log.i(TAG, "----> Answer - "+jResponse.toString());
+                Log.i(TAG,  currentSequenceNumber+" "+getCommandName()+" >>>----> Answer - "+jResponse.toString());
                 return ResponseParser.parseResponse(jResponse);
             } catch (JSONException e) {
-                Log.e(TAG, "~~~~>  Command answer parse error - "+e.getMessage(), e);
+                Log.e(TAG,  currentSequenceNumber+" "+getCommandName()+" ~~~~>  Command answer parse error - "+e.getMessage(), e);
                 e.printStackTrace();
                 throw new IOException("Error parse response", e);
             } finally {
@@ -115,7 +119,7 @@ public abstract class BaseRestCommand {
     private OnTextDataReceivedListener rcvListener = new OnTextDataReceivedListener() {
         @Override
         public void onReceive(String data) {
-            Log.d(TAG, "Raw data received - "+data);
+            Log.d(TAG,  currentSequenceNumber+" "+getCommandName()+" Raw data received - "+data);
             try {
                 JSONObject jrsp = new JSONObject(data);
                 int id = RestUtils.parseIntOptString(jrsp, "id");
@@ -128,7 +132,7 @@ public abstract class BaseRestCommand {
                     // This is not for me!
                 }
             } catch (JSONException ignore) {
-                Log.e(TAG, "!!! Receiver thread. Imitial parsing answer error - "+ignore.getMessage(), ignore);
+                Log.e(TAG,  currentSequenceNumber+" "+getCommandName()+" !!! Receiver thread. Initial parsing answer error - "+ignore.getMessage(), ignore);
                 ignore.printStackTrace();
                 // Ignore this error.
                 // Timeout error may be fired in the waiting-for-response thread.

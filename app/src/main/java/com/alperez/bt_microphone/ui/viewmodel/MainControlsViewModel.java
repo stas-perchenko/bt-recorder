@@ -1,5 +1,6 @@
 package com.alperez.bt_microphone.ui.viewmodel;
 
+import android.app.Activity;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.location.Location;
@@ -8,6 +9,7 @@ import com.alperez.bt_microphone.BR;
 import com.alperez.bt_microphone.core.DeviceState;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceFile;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
+import com.alperez.bt_microphone.utils.FormatUtils;
 
 import java.util.Date;
 
@@ -17,6 +19,11 @@ import java.util.Date;
 
 public class MainControlsViewModel extends BaseObservable {
 
+    private Activity hostActivity;
+
+    public MainControlsViewModel(Activity hostActivity) {
+        this.hostActivity = hostActivity;
+    }
 
     private boolean controlsLocked;
     private boolean optionsLocked;
@@ -33,9 +40,20 @@ public class MainControlsViewModel extends BaseObservable {
     private boolean phantomPower;
     private int recordingSampleRate = 0;
     private String gainLevel = "0";
+    private String memCardStatus = "";
 
 
+    private Location currentDeviceLocation;
 
+    @Bindable
+    public Location getCurrentDeviceLocation() {
+        return currentDeviceLocation;
+    }
+
+    public void setCurrentDeviceLocation(Location currentDeviceLocation) {
+        this.currentDeviceLocation = currentDeviceLocation;
+        notifyPropertyChanged(BR.currentDeviceLocation);
+    }
 
 
 
@@ -78,13 +96,17 @@ public class MainControlsViewModel extends BaseObservable {
      * @param devStatus
      */
     public void setDeviceStatus(DeviceStatus devStatus) {
+        long timeRecordingMillis = 1000*devStatus.freeSpaceBytes() / (3 * devStatus.recordingSampleRate());
+
+
         setDeviceTime(devStatus.deviceTime());
         setDevState(devStatus.deviceState());
-        setMemorySpace(Long.toString(devStatus.freeSpaceBytes()));
+        setMemorySpace( FormatUtils.timeMillisToHMS(timeRecordingMillis) );
         setBatteryLevel(Integer.toString(devStatus.batteryLevel()));
         setPhantomPower(devStatus.isPhantomPowerOn());
         setGainLevel(Integer.toString(devStatus.gainLevel()));
         setRecordingSampleRate(devStatus.recordingSampleRate());
+        setMemCardStatus(FormatUtils.memoryCartStatusToText(hostActivity, devStatus.memoryCardstatus()));
 
 
         switch (devStatus.deviceState()) {
@@ -117,16 +139,23 @@ public class MainControlsViewModel extends BaseObservable {
         this.devState = devState;
         notifyPropertyChanged(BR.devState);
     }
+
+
+
     @Bindable
     public String getMemorySpace() {
         return memorySpace;
     }
+
+
     public void setMemorySpace(String memorySpace) {
         if (!memorySpace.equals(this.memorySpace)) {
             this.memorySpace = memorySpace;
             notifyPropertyChanged(BR.memorySpace);
         }
     }
+
+
     @Bindable
     public String getBatteryLevel() {
         return batteryLevel;
@@ -167,6 +196,16 @@ public class MainControlsViewModel extends BaseObservable {
         notifyPropertyChanged(BR.recordingSampleRate);
     }
 
+    @Bindable
+    public String getMemCardStatus() {
+        return memCardStatus;
+    }
+
+    public void setMemCardStatus(String memCardStatus) {
+        this.memCardStatus = memCardStatus;
+        notifyPropertyChanged(BR.memCardStatus);
+    }
+
     /**********************************************************************************************/
 
 
@@ -175,7 +214,7 @@ public class MainControlsViewModel extends BaseObservable {
     private long currentDuration;
     private float currentPosition;
     private String currentSampleRate = "0";
-    private Location currentLocation = new Location("");
+    private Location currentFileLocation;
 
 
     public void setCurrentFile(DeviceFile devFile) {
@@ -183,7 +222,7 @@ public class MainControlsViewModel extends BaseObservable {
         setCurrentDuration(devFile.durationMillis());
         setCurrentPosition(devFile.currentPosition());
         setCurrentSampleRate(Integer.toString(devFile.sampleRate()));
-        setCurrentLocation(devFile.geoLocation());
+        setCurrentFileLocation(devFile.geoLocation());
     }
 
 
@@ -242,14 +281,15 @@ public class MainControlsViewModel extends BaseObservable {
     }
 
     @Bindable
-    public Location getCurrentLocation() {
-        return currentLocation;
+    public Location getCurrentFileLocation() {
+        return currentFileLocation;
     }
 
-    public void setCurrentLocation(Location currentLocation) {
-        if (currentLocation.distanceTo(this.currentLocation) > 10) {
-            this.currentLocation = currentLocation;
-            notifyPropertyChanged(BR.currentLocation);
-        }
+    public void setCurrentFileLocation(Location currentFileLocation) {
+        this.currentFileLocation = currentFileLocation;
+        notifyPropertyChanged(BR.currentFileLocation);
     }
+
+
+
 }

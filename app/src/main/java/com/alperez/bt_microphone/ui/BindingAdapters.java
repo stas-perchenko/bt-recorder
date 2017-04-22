@@ -91,7 +91,7 @@ public class BindingAdapters {
 
     @BindingConversion
     public static String convertToString(Location loc) {
-        return String.format("lat: %s\nlon: %s", latitudeToString(loc.getLatitude()), longitudeToString(loc.getLongitude()));
+        return (loc != null) ? String.format("lat: %s\nlon: %s", latitudeToString(loc.getLatitude()), longitudeToString(loc.getLongitude())) : "lat: -.----\nlon: -.----";
     }
 
 

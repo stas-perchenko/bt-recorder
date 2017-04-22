@@ -42,6 +42,10 @@
         <item name="att_btn_background">@drawable/bg_btn_toggle_orange</item>
     </style>
 
+    <style name="ThemeButton.TogglableBlack">
+        <item name="att_btn_background">@drawable/bg_btn_toggle_black</item>
+    </style>
+
 
 
 

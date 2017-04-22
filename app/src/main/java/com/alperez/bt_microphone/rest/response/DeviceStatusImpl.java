@@ -27,6 +27,7 @@ class DeviceStatusImpl implements DeviceStatus {
     private int recordingSampleRate;
     private int gainLevel;
     private Location deviceLocation;
+    private int memoryCardstatus;
 
     public static DeviceStatusImpl fromJson(JSONObject jStatus) throws JSONException {
         DeviceStatusImpl model = new DeviceStatusImpl();
@@ -38,9 +39,10 @@ class DeviceStatusImpl implements DeviceStatus {
             throw new JSONException("Wrong time format - "+dt);
         }
         model.deviceLocation = RestUtils.parseLocationFromJson(jStatus);
-        model.freeSpaceBytes = jStatus.getLong("space");
+        model.freeSpaceBytes = jStatus.getLong("space") * 1024;
         model.batteryLevel = RestUtils.parseIntOptString(jStatus, "battery");
         model.phantomPowerOn = RestUtils.parseBooleanOnOffFallback(jStatus, "phantom");
+        model.memoryCardstatus = jStatus.optInt("sdcard", -1);
         try {
             model.deviceState = parseDeviceState(jStatus.getString("state"));
         } catch (IllegalArgumentException e) {
@@ -105,7 +107,11 @@ class DeviceStatusImpl implements DeviceStatus {
         return gainLevel;
     }
 
-    public Location getDeviceLocation() {
+    public Location deviceLocation() {
         return deviceLocation;
+    }
+
+    public int memoryCardstatus() {
+        return memoryCardstatus;
     }
 }
