@@ -1,12 +1,10 @@
 package com.alperez.bt_microphone.ui.activity;
 
 import android.bluetooth.BluetoothAdapter;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,8 +18,6 @@ import com.alperez.bt_microphone.model.DiscoveredBluetoothDevice;
 import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
 import com.alperez.bt_microphone.ui.Layout;
-import com.alperez.bt_microphone.ui.fragment.CheckKnownDevicesFragment;
-import com.alperez.bt_microphone.ui.fragment.CheckNewDeviceFragment;
 import com.alperez.bt_microphone.ui.fragment.DiscoverDevicesFragment;
 
 import java.util.HashMap;
@@ -29,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 @Layout(value = R.layout.activity_start)
-public class StartActivity extends BaseActivity implements DiscoverDevicesFragment.BluetoothAdapterProvider, DiscoverDevicesFragment.OnDeviceSelectionResultListener, CheckNewDeviceFragment.OnDeviceFerifiedListener {
+public class StartActivity extends BaseActivity implements DiscoverDevicesFragment.BluetoothAdapterProvider, DiscoverDevicesFragment.OnDeviceSelectionResultListener {
+    private static final int REQUEST_VALIDATE_DEVICE = 101;
 
 
     BluetoothAdapter btAdapter;
@@ -39,6 +36,16 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
     private Map<String, Fragment> allFragments = new HashMap<>();
     private Fragment currFragment;
 
+
+    @Override
+    protected String getActivityTitle() {
+        return "START SCREEN";
+    }
+
+    @Override
+    protected String getActivitySubtitle() {
+        return null;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +65,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
         setKnownDevicesGroupVisible(savedDevices.size() > 0);
 
         findViewById(R.id.btn_connect_last).setOnClickListener(v -> goToMainActivity(savedDevices.get(0)));
-        findViewById(R.id.btn_check_known).setOnClickListener(v -> showCheckKnownDevicesFragment());
+        findViewById(R.id.btn_check_known).setOnClickListener(v -> startActivity(new Intent(this, KnownDeviceListActivity.class)));
         findViewById(R.id.btn_search_new).setOnClickListener(v -> showDiscoverDevicesFragment());
 
     }
@@ -70,30 +77,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
         finish();
     }
 
-    private void showCheckKnownDevicesFragment() {
-        if ((currFragment != null) && (currFragment instanceof CheckKnownDevicesFragment)) {
-            // The required fragment is being shown;
-            return;
-        }
 
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if (currFragment != null) {
-            ft.detach(currFragment);
-        }
-
-        Fragment f = allFragments.get(CheckKnownDevicesFragment.class.getName());
-        if (f != null) {
-            ((CheckKnownDevicesFragment) f).setDevices(savedDevices);
-            ft.attach(f);
-        } else {
-            f = new CheckKnownDevicesFragment();
-            ((CheckKnownDevicesFragment) f).setDevices(savedDevices);
-            allFragments.put(CheckKnownDevicesFragment.class.getName(), f);
-            ft.add(R.id.children_fragments_container, f);
-        }
-        currFragment = f;
-        ft.commit();
-    }
 
     private void showDiscoverDevicesFragment() {
         if ((currFragment != null) && (currFragment instanceof DiscoverDevicesFragment)) {
@@ -130,26 +114,7 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
 
     @Override
     public void onNewDeviceSelected(DiscoveredBluetoothDevice device) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if ((currFragment != null) && (currFragment instanceof CheckNewDeviceFragment)) {
-            ft.remove(currFragment);
-            CheckNewDeviceFragment removedFragment = (CheckNewDeviceFragment) allFragments.remove(CheckNewDeviceFragment.class.getName());
-            currFragment = null;
-        } else if (currFragment != null) {
-            ft.detach(currFragment);
-        }
-
-        Fragment f = allFragments.get(CheckNewDeviceFragment.class.getName());
-        if (f != null) {
-            ((CheckNewDeviceFragment) f).setArgDevice(device);
-            ft.attach(f);
-        } else {
-            f = CheckNewDeviceFragment.newInstance(device);
-            allFragments.put(CheckNewDeviceFragment.class.getName(), f);
-            ft.add(R.id.children_fragments_container, f);
-        }
-        currFragment = f;
-        ft.commit();
+        ValidateNewDeviceActvity.startForResult(this, REQUEST_VALIDATE_DEVICE, device);
     }
 
     @Override
@@ -158,28 +123,17 @@ public class StartActivity extends BaseActivity implements DiscoverDevicesFragme
     }
 
 
-
-
-
-    /**********************  Interfaces for Check device Fragment  ********************************/
     @Override
-    public void onDeveiceVerified(ValidDeviceDbModel device) {
-        goToMainActivity(device);
-    }
-
-    @Override
-    public void onErrorVerification(DiscoveredBluetoothDevice device, Throwable error) {
-
-        new AlertDialog.Builder(this).setTitle("Verification failed").setMessage("Error details - "+error.getMessage()).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_VALIDATE_DEVICE && resultCode == RESULT_OK) {
+            ValidDeviceDbModel result = data.getParcelableExtra(ValidateNewDeviceActvity.RESULT_VALID_DEVICE);
+            if (result != null) {
+                goToMainActivity(result);
             }
-        }).show();
-
-
+        } else if (requestCode != REQUEST_VALIDATE_DEVICE) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
-
 
 
 

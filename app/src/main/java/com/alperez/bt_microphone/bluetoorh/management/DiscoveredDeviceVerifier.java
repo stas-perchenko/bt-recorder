@@ -1,16 +1,29 @@
 package com.alperez.bt_microphone.bluetoorh.management;
 
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.alperez.bt_microphone.GlobalConstants;
+import com.alperez.bt_microphone.bluetoorh.BtUtils;
 import com.alperez.bt_microphone.model.DiscoveredBluetoothDevice;
 import com.alperez.bt_microphone.model.ValidDeviceDbModel;
+import com.alperez.bt_microphone.rest.RestUtils;
 import com.alperez.bt_microphone.utils.Callback;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Created by stanislav.perchenko on 3/12/2017.
@@ -23,7 +36,6 @@ public class DiscoveredDeviceVerifier {
 
     private final DiscoveredBluetoothDevice device;
     private Callback<ValidDeviceDbModel> resultCallback;
-    private OnStageListener testListener;
 
 
 
@@ -34,22 +46,19 @@ public class DiscoveredDeviceVerifier {
 
 
 
-    public static DiscoveredDeviceVerifier createForDevice(DiscoveredBluetoothDevice device, @NonNull OnStageListener testListener) {
-        return new DiscoveredDeviceVerifier(device, testListener);
+    public static DiscoveredDeviceVerifier createForDevice(DiscoveredBluetoothDevice device) {
+        return new DiscoveredDeviceVerifier(device);
     }
 
 
-    private DiscoveredDeviceVerifier(DiscoveredBluetoothDevice device, OnStageListener testListener) {
+    private DiscoveredDeviceVerifier(DiscoveredBluetoothDevice device) {
         this.device = device;
-        this.testListener = testListener;
-
-
 
         worker = new Thread(getClass().getSimpleName()) {
             @Override
             public void run() {
                 try {
-                    ValidDeviceDbModel result = doTheJobBackground();
+                    ValidDeviceDbModel result = doTheJobBackground(device.getDevice());
                     resultHandler.obtainMessage(0, result).sendToTarget();
                 } catch (InterruptedException e) {
                     Log.e(TAG, "Verifier thread was interrupted - "+e.getMessage());
@@ -58,18 +67,17 @@ public class DiscoveredDeviceVerifier {
                     Log.e(TAG, "Verifier has finished with error - "+e.getMessage());
                     e.printStackTrace();
                     resultHandler.obtainMessage(0, e).sendToTarget();
+                } finally {
+                    BtUtils.silentlyCloseCloseable(btSocket);
                 }
             }
         };
     }
 
-    public DiscoveredDeviceVerifier withResultCallback(Callback<ValidDeviceDbModel> callback) {
+
+
+    public DiscoveredDeviceVerifier execute(Callback<ValidDeviceDbModel> callback) {
         resultCallback = callback;
-        return this;
-    }
-
-
-    public DiscoveredDeviceVerifier start() {
         worker.start();
         return this;
     }
@@ -77,75 +85,99 @@ public class DiscoveredDeviceVerifier {
     public void release() {
         released = true;
         worker.interrupt();
+
+
+        BtUtils.silentlyCloseCloseable(btSocket);
     }
 
 
 
-    private ValidDeviceDbModel doTheJobBackground() throws Exception {
-        //--- Initial delay ---
-        Thread.sleep(3500);
-/*
-        //--- Stage 1 ---
-        resultHandler.obtainMessage(MSG_STAGE_1_START).sendToTarget();
-        //Thread.sleep(450);
-        BluetoothSocket soc = null;
-        try {
-            Log.d(TAG, "Create socket");
-            soc = device.getDevice().createRfcommSocketToServiceRecord(GlobalConstants.UUID_SERVICE_1_1);
-            Log.d(TAG, "Socket.connect()");
-            soc.connect();
-        } catch (IOException connectException) {
-            BtUtils.silentCloseBtSocket(soc);
-            throw connectException;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    BluetoothSocket btSocket;
+
+
+    private final Object rcvDataLock = new Object();
+    private VersionResponse receivedDataModel;
+
+
+    private ValidDeviceDbModel doTheJobBackground(BluetoothDevice btDev) throws Exception {
+
+
+        btSocket = btDev.createRfcommSocketToServiceRecord(GlobalConstants.UUID_SERVICE_1_1);
+        btSocket.connect();
+
+
+        new RcvWorkerThread(btSocket.getInputStream()).start();
+
+
+
+        int commandId = sendVersionCommand(btSocket.getOutputStream());
+
+
+        VersionResponse localResponse;
+        synchronized (rcvDataLock) {
+            rcvDataLock.wait(5000);
+            localResponse = receivedDataModel;
         }
-        resultHandler.obtainMessage(MSG_STAGE_1_COMPLETE).sendToTarget();
-        if (released) {
-            throw new InterruptedException("Manually released");
+        if (localResponse == null) {
+            throw new IOException("The device did not respond in time");
+        } else if (localResponse.id != commandId) {
+            throw new IOException("The device respond with wrong data ID");
         }
 
-        //--- Stage 2 ---
-        Thread.sleep(80);
-        resultHandler.obtainMessage(MSG_STAGE_2_START).sendToTarget();
-        OutputStream os = null;
-        try {
-            Log.d(TAG, "Get OutputStream from the socket");
-            os = soc.getOutputStream();
-            for (int i=0; i<10; i++) {
-                if (released) {
-                    throw new InterruptedException("Manually released");
-                }
-                Log.d(TAG, "Sending 'Hello world' ...");
-                os.write("{\"id\": 1,\"command\": \"status\"}\r\n".getBytes());
-                os.flush();
-                Log.d(TAG, "... OK");
-                Thread.sleep(800);
-            }
-        } finally {
-            Log.d(TAG, "Close OutputStream");
-            BtUtils.silentlyCloseCloseable(os);
-        }
-        resultHandler.obtainMessage(MSG_STAGE_2_COMPLETE).sendToTarget();
-
-
-        //--- Stage 3 ---
-        resultHandler.obtainMessage(MSG_STAGE_3_START).sendToTarget();
-        Log.d(TAG, "Close socket");
-        BtUtils.silentCloseBtSocket(soc);
-        Thread.sleep(250);
-        resultHandler.obtainMessage(MSG_STAGE_3_COMPLETE).sendToTarget();
-
-*/
         return ValidDeviceDbModel.builder()
-                .setMacAddress(device.getDevice().getAddress())
-                .setDeviceName(device.getDevice().getName())
-                .setSerialNumber("sdgjdf-kgjbdfg-dflg")
-                .setHardwareVersion(2)
-                .setFirmwareVersion(150)
-                .setReleaseDate(new Date(System.currentTimeMillis() - 2547864235L))
+                .setMacAddress(btDev.getAddress())
+                .setDeviceName(btDev.getName())
+                .setSerialNumber(localResponse.serialNumber)
+                .setHardwareVersion(localResponse.hVer)
+                .setFirmwareVersion(localResponse.sVer)
+                .setReleaseDate(localResponse.manufDate)
                 .setTimeDiscovered(new Date())
                 .setTimeLastConnected(new Date())
-                .setBluetoothDevice(device.getDevice())
+                .setBluetoothDevice(btDev)
                 .build();
+    }
+
+    private int sendVersionCommand(OutputStream oStream) throws JSONException, IOException {
+        JSONObject jCommand = new JSONObject();
+        jCommand.put("id", new Random().nextInt(999999)+1000);
+        jCommand.put("command", "version");
+
+        oStream.write((jCommand.toString()+"\r\n").getBytes());
+
+        return jCommand.getInt("id");
     }
 
 
@@ -159,53 +191,112 @@ public class DiscoveredDeviceVerifier {
     private final Handler resultHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_STAGE_1_START:
-                    testListener.onStage1Start();
-                    break;
-                case MSG_STAGE_1_COMPLETE:
-                    testListener.onStage1Complete();
-                    break;
-                case MSG_STAGE_2_START:
-                    testListener.onStage2Start();
-                    break;
-                case MSG_STAGE_2_COMPLETE:
-                    testListener.onStage2Complete();
-                    break;
-                case MSG_STAGE_3_START:
-                    testListener.onStage3Start();
-                    break;
-                case MSG_STAGE_3_COMPLETE:
-                    testListener.onStage3Complete();
-                    break;
-                default:
-                    if (resultCallback != null) {
-                        if (msg.obj instanceof ValidDeviceDbModel) {
-                            resultCallback.onComplete((ValidDeviceDbModel) msg.obj);
-                        } else if (msg.obj instanceof Throwable) {
-                            resultCallback.onError((Throwable) msg.obj);
-                        }
-                    }
+            if (resultCallback != null) {
+                if (msg.obj instanceof ValidDeviceDbModel) {
+                    resultCallback.onComplete((ValidDeviceDbModel) msg.obj);
+                } else if (msg.obj instanceof Throwable) {
+                    resultCallback.onError((Throwable) msg.obj);
+                }
             }
         }
     };
 
 
-    private static final int MSG_STAGE_1_START = 100;
-    private static final int MSG_STAGE_1_COMPLETE = 101;
-    private static final int MSG_STAGE_2_START = 200;
-    private static final int MSG_STAGE_2_COMPLETE = 201;
-    private static final int MSG_STAGE_3_START = 300;
-    private static final int MSG_STAGE_3_COMPLETE = 301;
 
 
 
-    public interface OnStageListener {
-        void onStage1Start();
-        void onStage1Complete();
-        void onStage2Start();
-        void onStage2Complete();
-        void onStage3Start();
-        void onStage3Complete();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*****************************  Receiver part  ************************************************/
+    private class RcvWorkerThread extends Thread {
+
+        InputStream iStream;
+
+        public RcvWorkerThread(InputStream iStream) {
+            super("verification-receiver-thread");
+            this.iStream = iStream;
+        }
+
+        @Override
+        public void run() {
+            while(!released) {
+                try {
+                    Thread.sleep(600);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+
+
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream(2048);
+                    int symb;
+                    byte b_1=0, b_2=0;
+                    while((symb = iStream.read()) >= 0 && !released) {
+                        b_2 = b_1;
+                        b_1 = (byte)symb;
+                        bos.write(symb);
+
+                        if ((b_2 == 0x0D && b_1 == 0x0A)) {
+                            byte[] data = bos.toByteArray();
+                            String textData = new String(data, 0, data.length-2);
+                            bos.reset();
+                            synchronized (rcvDataLock) {
+                                receivedDataModel = VersionResponse.fromJson(textData);
+                                rcvDataLock.notifyAll();
+                            }
+                            return;
+                        }
+                    }
+
+
+                } catch (Exception ignore){
+
+                } finally {
+                    BtUtils.silentlyCloseCloseable(iStream);
+                }
+            }
+            BtUtils.silentlyCloseCloseable(iStream);
+        } //run()
     }
+
+    private static class VersionResponse {
+        public int id;
+        public String serialNumber;
+        public int hVer, sVer;
+        public Date manufDate;
+
+        public static VersionResponse fromJson(String json) throws JSONException, ParseException {
+            JSONObject jResp = new JSONObject(json);
+
+            VersionResponse model = new VersionResponse();
+            model.id = jResp.getInt("id");
+            if (!jResp.getString("answer").equalsIgnoreCase("ok")) {
+                throw new JSONException("Device respond error");
+            }
+            JSONObject jPayload = jResp.getJSONObject("version");
+            model.serialNumber = jPayload.getString("serial");
+            model.hVer = jPayload.getInt("hardware");
+            model.sVer = jPayload.getInt("software");
+            model.manufDate = RestUtils.parseRemoteDateTime(jPayload.getString("time"));
+            return model;
+        }
+
+        private VersionResponse(){}
+    }
+
+
 }

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" alias="v"/>
+        <import type="android.text.TextUtils" alias="TU"/>
+        <import type="com.alperez.bt_microphone.ui.viewmodel.BtDeviceViewModel" alias="VM" />
+        <import type="com.alperez.bt_microphone.utils.FormatUtils"/>
+        <import type="java.lang.String"/>
+        <import type="com.alperez.bt_microphone.ui.viewmodel.KnownDeviceListItemViewModel.KnownDeviceStatus"/>
+
+        <variable
+            name="viewModel"
+            type="com.alperez.bt_microphone.ui.viewmodel.KnownDeviceListItemViewModel"/>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="@{viewModel.knownDeviceStatus != null &amp;&amp; viewModel.knownDeviceStatus == KnownDeviceStatus.STATUS_ONLINE}">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/table_row_to_row_margin"
+            android:paddingBottom="@dimen/table_row_to_row_margin">
+
+            <FrameLayout android:id="@+id/progress_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:enabled="@{viewModel.knownDeviceStatus != null &amp;&amp; viewModel.knownDeviceStatus == KnownDeviceStatus.STATUS_ONLINE}"
+                    android:visibility="@{(viewModel.knownDeviceStatus != null &amp;&amp; viewModel.knownDeviceStatus != KnownDeviceStatus.STATUS_CHECKING) ? v.VISIBLE : v.INVISIBLE}"
+                    android:src="@drawable/bt_device_state_selector"/>
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{(viewModel.knownDeviceStatus != null &amp;&amp; viewModel.knownDeviceStatus == KnownDeviceStatus.STATUS_CHECKING) ? v.VISIBLE : v.INVISIBLE}"
+                    style="@android:style/Widget.DeviceDefault.ProgressBar.Small"/>
+
+            </FrameLayout>
+
+            <RelativeLayout android:id="@+id/name_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/progress_container"
+                android:layout_marginRight="8dp">
+
+                <TextView android:id="@+id/txt_mac"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="4dp"
+                    android:textSize="10sp"
+                    android:text="@{viewModel.validDevice.macAddress}"/>
+
+                <TextView android:id="@+id/txt_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@id/txt_mac"
+                    android:layout_marginRight="8dp"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="@{viewModel.validDevice.userDefinedName}" />
+
+
+            </RelativeLayout>
+
+
+            <TableLayout android:id="@+id/table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/name_container"
+                android:layout_toLeftOf="@id/progress_container"
+                android:layout_marginRight="8dp"
+                android:stretchColumns="1"
+                android:shrinkColumns="1">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/table_row_to_row_margin">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="12sp"
+                        android:text="Discovered at:  "/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="12sp"
+                        app:date_and_time="@{viewModel.validDevice.timeDiscovered}"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:layout_marginTop="@dimen/table_row_to_row_margin">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="12sp"
+                        android:text="Last time connected:  "/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="12sp"
+                        app:date_and_time="@{viewModel.validDevice.timeLastConnected}"/>
+                </TableRow>
+
+            </TableLayout>
+
+
+
+        </RelativeLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="@color/list_divider"/>
+    </FrameLayout>
+
+
+
+</layout>

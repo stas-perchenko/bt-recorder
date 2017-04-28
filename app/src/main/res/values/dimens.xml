@@ -10,4 +10,6 @@
     <dimen name="btn_lock_indicator_margin">8dp</dimen>
 
     <dimen name="row_height">42dp</dimen>
+
+    <dimen name="table_row_to_row_margin">6dp</dimen>
 </resources>

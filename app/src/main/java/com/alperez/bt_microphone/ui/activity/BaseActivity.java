@@ -4,11 +4,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -22,19 +24,65 @@ import java.lang.annotation.Annotation;
  * Created by stanislav.perchenko on 3/12/2017.
  */
 
-public class BaseActivity extends AppCompatActivity implements IFullScreenProgress {
+public abstract class BaseActivity extends AppCompatActivity implements IFullScreenProgress {
     private ProgressDialog mDialog;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Class cls = getClass();
-        if (!cls.isAnnotationPresent(Layout.class)) return;
-        Annotation annotation = cls.getAnnotation(Layout.class);
-        Layout layout = ((Layout) annotation);
-        setContentView(layout.value());
 
+        //----  Set content by annotation if presented  ----
+        Layout layAnnot = getClass().getAnnotation(Layout.class);
+        if (layAnnot != null) {
+            setContentView(layAnnot.value());
+        }
     }
+
+
+
+    protected void setupToolbar() {
+        ActionBar ab = getSupportActionBar();
+        if (ab == null) {
+            setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+            ab = getSupportActionBar();
+        }
+        if(ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+            ab.setTitle(getActivityTitle());
+            ab.setSubtitle(getActivitySubtitle());
+        }
+
+        //--- This is the ugly hack to support setting title multiple times when the Toolbar
+        //--- is in the CollapsingToolbarLayout
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        if (tb != null) {
+            ViewParent vp = tb.getParent();
+            if ((vp != null) && (vp instanceof CollapsingToolbarLayout)) {
+                ((CollapsingToolbarLayout) vp).setTitle(getActivityTitle());
+            }
+        }
+    }
+
+    protected final void updateActivityTitleAndSubtitle() {
+        ActionBar ab = getSupportActionBar();
+        if(ab != null) {
+            ab.setTitle(getActivityTitle());
+            ab.setSubtitle(getActivitySubtitle());
+        }
+    }
+
+
+    protected abstract String getActivityTitle();
+    protected abstract String getActivitySubtitle();
+
+
+
+
+
+
+
+
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -60,14 +108,7 @@ public class BaseActivity extends AppCompatActivity implements IFullScreenProgre
         return result;
     }
 
-    public void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        final ActionBar ab = getSupportActionBar();
-        if(ab != null) {
-            ab.setDisplayHomeAsUpEnabled(true);
-        }
-    }
+
 
     @Override
     public void showFullScreenProgress(String message) {

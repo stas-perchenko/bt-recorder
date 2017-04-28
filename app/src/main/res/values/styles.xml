@@ -19,4 +19,19 @@
         <item name="windowActionBarOverlay">true</item>
     </style>
 
+
+    <style name="Text">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Text.TableTitle">
+        <item name="android:textColor">@color/text_red</item>
+    </style>
+
+    <style name="Text.TableValue">
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>
+    </style>
+
 </resources>

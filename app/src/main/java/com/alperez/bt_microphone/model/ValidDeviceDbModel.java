@@ -44,6 +44,14 @@ public abstract class ValidDeviceDbModel extends BaseDbModel implements BtDevice
     public abstract Date timeDiscovered();
     public abstract Date timeLastConnected();
 
+    public String hardwareVersionText() {
+        return Integer.toString(hardwareVersion());
+    }
+
+    public String firmwareVersionText() {
+        return Integer.toString(firmwareVersion());
+    }
+
     //--- Non-storeable runtime-calculated fields ---
     @Nullable
     public abstract BluetoothDevice bluetoothDevice();

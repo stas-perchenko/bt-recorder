@@ -184,7 +184,7 @@ public class DeviceFounderImpl implements DeviceFounder {
         if (handledMACs.contains(device.getDevice().getAddress())) {
             Log.d(TAG, "~~~~~~>>>  A device is discovered but already handled - "+device.getDevice().getAddress());
             return;
-        } else {
+        } else if (sequantialExecuter != null) {
             Log.d(TAG, "======>>>  onDeviceDiscovered() - "+device.getDevice().getAddress()+"   Enqueue new test!");
             handledMACs.add(device.getDevice().getAddress());
             sequantialExecuter.submit(new Runnable() {

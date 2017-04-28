@@ -9,6 +9,8 @@ import com.alperez.bt_microphone.rest.command.BaseRestCommand;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Locale;
+
 /**
  * Created by stanislav.perchenko on 4/21/2017.
  */
@@ -33,7 +35,7 @@ public class SetLocationLommand extends BaseRestCommand {
 
     @Override
     protected void fillInRequestBody(JSONObject jBody) throws JSONException {
-        jBody.put("lat", String.format("%.8f",location.getLatitude()));
-        jBody.put("lon", String.format("%.8f",location.getLongitude()));
+        jBody.put("lat", String.format(Locale.ENGLISH, "%.8f",location.getLatitude()));
+        jBody.put("lon", String.format(Locale.ENGLISH, "%.8f",location.getLongitude()));
     }
 }

@@ -83,6 +83,16 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected String getActivityTitle() {
+        return "MAIN SCREEN";
+    }
+
+    @Override
+    protected String getActivitySubtitle() {
+        return null;
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupToolbar();
