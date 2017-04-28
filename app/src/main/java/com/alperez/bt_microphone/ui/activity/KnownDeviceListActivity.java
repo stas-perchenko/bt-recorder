@@ -3,14 +3,19 @@ package com.alperez.bt_microphone.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.LinearLayout;
 
 import com.alperez.bt_microphone.R;
 import com.alperez.bt_microphone.bluetoorh.management.DeviceOnlineChecker;
+import com.alperez.bt_microphone.bluetoorh.management.impl.DeviceFounderImpl;
 import com.alperez.bt_microphone.databinding.KnownDeviceListItemBinding;
 import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
+import com.alperez.bt_microphone.ui.SearchDevicesActivity;
 import com.alperez.bt_microphone.ui.viewmodel.KnownDeviceListItemViewModel;
 
 import java.util.ArrayList;
@@ -29,6 +34,8 @@ public class KnownDeviceListActivity extends BaseActivity implements DeviceOnlin
 
     private DeviceOnlineChecker deviceOnlineChecker;
 
+    private boolean areDevicesBeingChecked;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,7 +43,7 @@ public class KnownDeviceListActivity extends BaseActivity implements DeviceOnlin
 
         setContentView(R.layout.activity_known_device_list);
         vDeviceContainer = (LinearLayout) findViewById(R.id.container);
-        findViewById(R.id.action_search_new).setOnClickListener((v) -> {/* Open activity to search new devices */});
+        findViewById(R.id.action_search_new).setOnClickListener((v) -> startActivity(new Intent(this, SearchDevicesActivity.class)));
 
         setupToolbar();
 
@@ -50,6 +57,13 @@ public class KnownDeviceListActivity extends BaseActivity implements DeviceOnlin
             vModel.setKnownDeviceStatus(KnownDeviceListItemViewModel.KnownDeviceStatus.STATUS_CHECKING);
             deviceOnlineChecker.checkDeviceAsync(vModel.getValidDevice());
         }
+        areDevicesBeingChecked = true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateActionSearchClickability();
     }
 
     @Override
@@ -60,7 +74,7 @@ public class KnownDeviceListActivity extends BaseActivity implements DeviceOnlin
 
     @Override
     protected String getActivityTitle() {
-        return null;
+        return "STORED DEVICES";
     }
 
     @Override
@@ -107,12 +121,70 @@ public class KnownDeviceListActivity extends BaseActivity implements DeviceOnlin
         long checkedId = device.id();
         for (KnownDeviceListItemViewModel vModel : deviceVModels) {
             if (vModel.getValidDevice().id() == checkedId) {
-
+                nDevicesChecked ++;
                 //TODO Remove this after testing !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                if (++ nDevicesChecked > 1) throw new RuntimeException("Device address conflict");
+                if (nDevicesChecked > 1) throw new RuntimeException("Device address conflict");
                 vModel.setKnownDeviceStatus(online ? KnownDeviceListItemViewModel.KnownDeviceStatus.STATUS_ONLINE : KnownDeviceListItemViewModel.KnownDeviceStatus.STATUS_OFFLINE);
+
+
+                if (nDevicesChecked == deviceVModels.size()) {
+                    areDevicesBeingChecked = false;
+                    updateActionSearchClickability();
+                }
+
                 return;
             }
+        }
+    }
+
+
+
+    private void updateActionSearchClickability() {
+        findViewById(R.id.action_search_new).setEnabled(!areDevicesBeingChecked);
+    }
+
+
+
+
+    /*********************  Menu implementation  **************************************************/
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.menu_clear_db, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.action_clear_db:
+                clearDeviceCache();
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    private void clearDeviceCache() {
+        DatabaseAdapter db = new DatabaseAdapter();
+        try {
+            db.beginTransaction();
+
+            int nValid = db.clearValidDevices();
+            int nBlack = db.clearBlacklistedDevices();
+            Log.d(DeviceFounderImpl.TAG, String.format("Device cache was cleared. N valid = %d, N blacklisted = %d", nValid, nBlack));
+            db.commitTransaction();
+        } finally {
+            db.endTransaction();
+            db.close();
+
+
         }
     }
 }

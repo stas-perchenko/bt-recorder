@@ -172,7 +172,7 @@ public class BtSoundPlayerImpl implements BtSoundPlayer {
                     notifyBytesReceived(nBytes);
                     if (playEnabled.get()) {
                         //--- Mode PLAY ---
-                        aTrack.write(buffer, 0, Math.round(nBytes/1.5f));
+                        aTrack.write(buffer, 0, Math.round(nBytes));
 
 
                         soundLevelMeter.submitSamples(buffer, 0, nBytes);
