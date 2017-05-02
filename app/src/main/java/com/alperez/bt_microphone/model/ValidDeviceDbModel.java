@@ -132,7 +132,7 @@ public abstract class ValidDeviceDbModel extends BaseDbModel implements BtDevice
 
     @Override
     public String getName() {
-        return deviceName();
+        return userDefinedName();
     }
 
     @Override

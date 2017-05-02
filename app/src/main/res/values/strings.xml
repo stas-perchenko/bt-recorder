@@ -46,9 +46,15 @@
     <string name="action_show_memory_status">View SD card status</string>
     <string name="action_memory_format">Format memory card</string>
     <string name="action_set_time">Set current time</string>
+    <string name="action_power_off">Turn off device</string>
 
     <string name="dialog_format_title">Format Memory Card</string>
     <string name="dialog_format_message">All data will be lost. Are you sure?</string>
+
+    <string name="dialog_poweroff_title">Device power off</string>
+    <string name="dialog_poweroff_message">The device will be turned off. You cannot turn it back on remotely. Are you sure?</string>
+    <string name="msg_poweroff_progress">Turning off...</string>
+    <string name="msg_poweroff_ok">The device is down.</string>
 
     <string name="msg_formatting_progress">Formatting memory card.\nThis will take a while...</string>
     <string name="msg_formatting_error">Format memory card failed</string>

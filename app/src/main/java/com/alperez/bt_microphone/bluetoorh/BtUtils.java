@@ -8,8 +8,12 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.Nullable;
 
+import com.alperez.bt_microphone.model.ValidDeviceDbModel;
+import com.alperez.bt_microphone.storage.DatabaseAdapter;
+
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created by stanislav.perchenko on 3/9/2017.
@@ -70,6 +74,16 @@ public class BtUtils {
             nData[newLen+0] = 0x0D;
             nData[newLen+1] = 0x0A;
             return nData;
+        }
+    }
+
+
+    public static void setNowAsLastConnectedTimeForDevice(ValidDeviceDbModel dbModel) {
+        DatabaseAdapter db = new DatabaseAdapter();
+        try {
+            db.updateValidDeviceTimeLastConnected(dbModel.withTimeLastConnected(new Date()));
+        } finally {
+            db.close();
         }
     }
 }

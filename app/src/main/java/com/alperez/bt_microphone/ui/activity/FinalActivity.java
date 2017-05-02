@@ -39,6 +39,7 @@ import com.alperez.bt_microphone.databinding.ActivityFinalBinding;
 import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.rest.OnCompleteListener;
 import com.alperez.bt_microphone.rest.command.BaseRestCommand;
+import com.alperez.bt_microphone.rest.command.impl.VersionRestCommand;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceFile;
 import com.alperez.bt_microphone.rest.response.commonmodels.DeviceStatus;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
@@ -93,7 +94,7 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
         try {
             ValidDeviceDbModel dbDevice = getDeviceArgument();
             BluetoothDevice btDevice = BtUtils.getBtAdapter(this).getRemoteDevice(dbDevice.macAddress());
-            remDevice = new RemoteDevice(dbDevice.withBluetoothDevice(btDevice), 2000, this);
+            remDevice = new RemoteDevice(dbDevice.withBluetoothDevice(btDevice), GlobalConstants.GENERAL_COMMAND_TIMEOUT, this);
 
             mPlayer = new BtSoundPlayerImpl(btDevice, GlobalConstants.UUID_SERVICE_2, createAudioTrack(), new SoundLevelMeter((rms, peak) -> {
                 vBinding.levelPeak.setLevel(peak);
@@ -367,7 +368,7 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
 
     /**********************  Settings menu  *******************************************************/
     private void onShowSettings() {
-        String[] items = {getString(R.string.action_show_memory_status), getString(R.string.action_memory_format), getString(R.string.action_set_time)};
+        String[] items = {getString(R.string.action_show_memory_status), getString(R.string.action_memory_format), getString(R.string.action_set_time), getString(R.string.action_power_off)};
         new AlertDialog.Builder(this).setTitle(R.string.settings_dialog_title).setItems(items, (DialogInterface dialog, int which) -> {
             switch (which) {
                 case 0:
@@ -379,6 +380,8 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
                 case 2:
                     remDevice.commandSetTime(new Date());
                     break;
+                case 3:
+                    onPowerOff();
             }
         }).show();
     }
@@ -424,6 +427,49 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
         }
         return formattingProgress;
     }
+
+    /***********************  Power off command  **************************************************/
+    private void onPowerOff() {
+        new AlertDialog.Builder(this).setTitle(R.string.dialog_poweroff_title).setMessage(R.string.dialog_poweroff_message)
+                .setPositiveButton(android.R.string.yes, (DialogInterface dialog, int which) -> startPowerOff() )
+                .setNegativeButton(android.R.string.cancel, null).show();
+    }
+
+    private void startPowerOff() {
+        remDevice.commandPowerOff(new OnCompleteListener() {
+            @Override
+            public void onComplete() {
+                getPoweroffProgressDialog().dismiss();
+                Toast.makeText(FinalActivity.this, R.string.msg_poweroff_ok, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onError(String reason) {
+                getPoweroffProgressDialog().dismiss();
+                Toast.makeText(FinalActivity.this, getString(R.string.msg_formatting_error)+" - "+reason, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        getPoweroffProgressDialog().show();
+    }
+
+    private ProgressDialog poweroffProgress;
+    private ProgressDialog getPoweroffProgressDialog() {
+        if (poweroffProgress == null) {
+            poweroffProgress = new ProgressDialog(this);
+            poweroffProgress.setIndeterminate(true);
+            poweroffProgress.setCancelable(false);
+            poweroffProgress.setCanceledOnTouchOutside(false);
+            poweroffProgress.setMessage(getString(R.string.msg_poweroff_progress));
+        }
+        return poweroffProgress;
+    }
+
+
+
+
+
 
     /***********************  Show mem status menu option  ****************************************/
     private void onShowMemoryStatus() {
@@ -485,6 +531,10 @@ public class FinalActivity extends AppCompatActivity implements RemoteDevice.OnC
 
     @Override
     public void onSimpleCommandComplete(String commandName) {
+
+        if (commandName.equals(VersionRestCommand.COMMAND_NAME)) {
+            BtUtils.setNowAsLastConnectedTimeForDevice(remDevice.getDeviceDbModel());
+        }
         vBinding.getViewModel().setCommandInProgress(false);
     }
 

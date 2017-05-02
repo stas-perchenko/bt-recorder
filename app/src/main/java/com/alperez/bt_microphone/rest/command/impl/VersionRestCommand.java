@@ -13,7 +13,7 @@ import org.json.JSONObject;
  */
 
 public class VersionRestCommand extends BaseRestCommand {
-    private static final String COMMAND_NAME = "version";
+    public static final String COMMAND_NAME = "version";
 
     public VersionRestCommand(@NonNull BtDataTransceiver dataTransceiver) {
         super(dataTransceiver);

@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
-import com.alperez.bt_microphone.ui.SearchDevicesActivity;
+import com.alperez.bt_microphone.ui.activity.SearchDevicesActivity;
 import com.alperez.bt_microphone.ui.activity.KnownDeviceListActivity;
 
 /**

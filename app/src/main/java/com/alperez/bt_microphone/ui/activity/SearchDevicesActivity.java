@@ -1,11 +1,9 @@
-package com.alperez.bt_microphone.ui;
+package com.alperez.bt_microphone.ui.activity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.View;
-import android.widget.FrameLayout;
 
 import com.alperez.bt_microphone.R;
 import com.alperez.bt_microphone.bluetoorh.BluetoothNotSupportedException;

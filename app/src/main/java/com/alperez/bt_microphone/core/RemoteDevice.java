@@ -85,6 +85,10 @@ public class RemoteDevice {
         mDevice.releaseDataTransceiver();
     }
 
+    public ValidDeviceDbModel getDeviceDbModel() {
+        return mDevice;
+    }
+
 
     public void commandVersion() {
         scheduleNoParamCommand(VersionRestCommand.class);
@@ -132,9 +136,18 @@ public class RemoteDevice {
         }
     }
 
-    public void commandPowerOff() {
-        scheduleNoParamCommand(PowerOffRestCommand.class);
+    public void commandPowerOff(@NonNull OnCompleteListener callback) {
+        try {
+            BaseRestCommand comm = mCommandPool.getCommand(PowerOffRestCommand.class.getName());
+            commandExecutor.execute(new CommandHandlerWithCallback(comm, callback, GlobalConstants.POWEROFF_COMMAND_TIMEOUT));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+    /*public void commandPowerOff() {
+        scheduleNoParamCommand(PowerOffRestCommand.class);
+    }*/
 
     public void commandSetTime(Date time) {
         try {

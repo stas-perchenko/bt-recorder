@@ -95,7 +95,7 @@ public class DatabaseAdapter {
     }
 
     public List<ValidDeviceDbModel> selectAllValidDevices() {
-        Cursor c = db.query(ValidDeviceDbModel.TABLE_NAME, null, null, null, null, null, ValidDeviceDbModel.COLUMN_TIME_LAST_CONNECTED);
+        Cursor c = db.query(ValidDeviceDbModel.TABLE_NAME, null, null, null, null, null, ValidDeviceDbModel.COLUMN_TIME_LAST_CONNECTED+" DESC");
         try {
             List<ValidDeviceDbModel> result = new ArrayList<>(5);
             if (c.moveToFirst()) {
@@ -155,7 +155,7 @@ public class DatabaseAdapter {
     }
 
     public boolean updateValidDeviceTimeLastConnected(ValidDeviceDbModel device) {
-        String where = String.format("%s = %d", ValidDeviceDbModel.COLUMN_ID, device.id());
+        String where = String.format("%s = '%s'", ValidDeviceDbModel.COLUMN_MAC, device.macAddress());
         ContentValues vals = new ContentValues();
         vals.put(ValidDeviceDbModel.COLUMN_TIME_LAST_CONNECTED, device.timeLastConnected().getTime());
         return (db.update(ValidDeviceDbModel.TABLE_NAME, vals, where, null) > 0);

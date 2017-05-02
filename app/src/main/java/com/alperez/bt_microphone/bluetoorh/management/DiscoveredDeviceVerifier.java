@@ -241,7 +241,6 @@ public class DiscoveredDeviceVerifier {
 
                 try {
 
-
                     ByteArrayOutputStream bos = new ByteArrayOutputStream(2048);
                     int symb;
                     byte b_1=0, b_2=0;
@@ -273,7 +272,7 @@ public class DiscoveredDeviceVerifier {
         } //run()
     }
 
-    private static class VersionResponse {
+    public static class VersionResponse {
         public int id;
         public String serialNumber;
         public int hVer, sVer;

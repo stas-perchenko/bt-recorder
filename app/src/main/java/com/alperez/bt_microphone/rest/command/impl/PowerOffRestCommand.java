@@ -11,7 +11,7 @@ import org.json.JSONObject;
 /**
  * Created by stanislav.perchenko on 3/29/2017.
  */
-
+//TODO Remove this command!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 public class PowerOffRestCommand extends BaseRestCommand {
     private static final String COMMAND_NAME = "poweroff";
     public PowerOffRestCommand(@NonNull BtDataTransceiver dataTransceiver) {

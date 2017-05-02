@@ -1,5 +1,7 @@
 package com.alperez.bt_microphone.ui.activity;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,12 +12,13 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 
 import com.alperez.bt_microphone.R;
+import com.alperez.bt_microphone.bluetoorh.BluetoothNotSupportedException;
+import com.alperez.bt_microphone.bluetoorh.BtUtils;
 import com.alperez.bt_microphone.bluetoorh.management.DeviceOnlineChecker;
 import com.alperez.bt_microphone.bluetoorh.management.impl.DeviceFounderImpl;
 import com.alperez.bt_microphone.databinding.KnownDeviceListItemBinding;
 import com.alperez.bt_microphone.model.ValidDeviceDbModel;
 import com.alperez.bt_microphone.storage.DatabaseAdapter;
-import com.alperez.bt_microphone.ui.SearchDevicesActivity;
 import com.alperez.bt_microphone.ui.viewmodel.KnownDeviceListItemViewModel;
 
 import java.util.ArrayList;
@@ -27,6 +30,8 @@ import java.util.List;
 
 public class KnownDeviceListActivity extends BaseActivity implements DeviceOnlineChecker.OnCheckResultListener {
 
+
+    BluetoothAdapter btAdapter;
 
     private LinearLayout vDeviceContainer;
 
@@ -41,6 +46,15 @@ public class KnownDeviceListActivity extends BaseActivity implements DeviceOnlin
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        try {
+            btAdapter = BtUtils.getBtAdapter(this);
+        } catch (BluetoothNotSupportedException e) {
+            e.printStackTrace();
+            finish();
+            return;
+        }
+
+
         setContentView(R.layout.activity_known_device_list);
         vDeviceContainer = (LinearLayout) findViewById(R.id.container);
         findViewById(R.id.action_search_new).setOnClickListener((v) -> startActivity(new Intent(this, SearchDevicesActivity.class)));
@@ -52,6 +66,7 @@ public class KnownDeviceListActivity extends BaseActivity implements DeviceOnlin
         createDeviceViewItems(deviceVModels);
 
 
+        btAdapter.cancelDiscovery();
         deviceOnlineChecker = new DeviceOnlineChecker(this);
         for (KnownDeviceListItemViewModel vModel : deviceVModels) {
             vModel.setKnownDeviceStatus(KnownDeviceListItemViewModel.KnownDeviceStatus.STATUS_CHECKING);
@@ -91,7 +106,10 @@ public class KnownDeviceListActivity extends BaseActivity implements DeviceOnlin
 
             List<KnownDeviceListItemViewModel> result = new ArrayList<>(devs.size());
             for (ValidDeviceDbModel dev : devs) {
-                result.add(new KnownDeviceListItemViewModel(dev));
+
+                BluetoothDevice btDevice = btAdapter.getRemoteDevice(dev.macAddress());
+
+                result.add(new KnownDeviceListItemViewModel(dev.withBluetoothDevice(btDevice)));
             }
             return result;
         } finally {
@@ -122,8 +140,6 @@ public class KnownDeviceListActivity extends BaseActivity implements DeviceOnlin
         for (KnownDeviceListItemViewModel vModel : deviceVModels) {
             if (vModel.getValidDevice().id() == checkedId) {
                 nDevicesChecked ++;
-                //TODO Remove this after testing !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                if (nDevicesChecked > 1) throw new RuntimeException("Device address conflict");
                 vModel.setKnownDeviceStatus(online ? KnownDeviceListItemViewModel.KnownDeviceStatus.STATUS_ONLINE : KnownDeviceListItemViewModel.KnownDeviceStatus.STATUS_OFFLINE);
 
 
