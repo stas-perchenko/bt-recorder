@@ -26,9 +26,9 @@
     <string name="action_gain_down">Less Gain</string>
     <string name="action_prev_index">Previous Index</string>
     <string name="action_next_index">Next Index</string>
-    <string name="action_quality_24_48">48kSps</string>
-    <string name="action_quality_24_96">96kSps</string>
-    <string name="action_quality_24_192">192kSps</string>
+    <string name="action_quality_24_48">48kHz</string>
+    <string name="action_quality_24_96">96kHz</string>
+    <string name="action_quality_24_192">192kHz</string>
     <string name="action_pahntom_on">Phantom On</string>
     <string name="action_pahntom_off">Phantom Off</string>
 
